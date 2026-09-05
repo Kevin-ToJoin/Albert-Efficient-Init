@@ -1,147 +1,71 @@
-# Albert-Efficient-Init
+# Triaje de Proyectos
 
-Local-only rule files for Claude Code that keep responses concise and prevent
-the common failure modes (sycophancy, verbosity, invented APIs). Drop into
-any project. The files are auto-added to that project's `.gitignore` so they
-only affect your local sessions and never reach your collaborators.
+Un manual de campo para entrar en un proyecto que no conoces. Se navega por
+dos ejes y tiene buscador.
 
-## What it gives you
+**Publicado:** https://claude.ai/code/artifact/a33fca32-5b41-4f7f-a71b-01bc2ae7abda
 
-After running the installer in a target project you get:
+## La idea
+
+Empiezas por el estado en el que está el proyecto, no por la tecnología que
+usa. El orden de trabajo cambia mucho más entre un proyecto vivo y uno
+abandonado que entre Node y Python.
+
+Cuatro situaciones, con el criterio explícito para reconocer cada una:
+
+| | Cómo saber que estás aquí |
+|---|---|
+| Empiezo de cero | Menos de 30 commits, o menos de 90 días, sin tags de release |
+| Está vivo y en marcha | Commit en los últimos 30 días, dos o más autores, CI presente |
+| En mantenimiento | Último commit entre 30 días y 12 meses, y lo reciente son fixes |
+| Heredé algo abandonado | Sin commits en 12 meses; o sin tests y sin CI con más de 500 ficheros |
+
+Cada situación trae el riesgo real, el orden de trabajo, y **qué no tocar
+todavía**, que suele ser la parte más útil.
+
+## Las fichas
+
+22 fichas repartidas en seis dominios, cada una empezando en hoja nueva: seguridad, calidad y tests, frontend,
+backend, proceso y entrega, y trabajar con Claude. Se llega a ellas desde
+cualquiera de los dos ejes o desde el buscador.
+
+Cada ficha tiene la misma forma:
+
+- **Qué es**, en dos líneas.
+- **Cómo comprobarlo**, con pasos concretos.
+- **Señal de alarma**: cómo suena una mala respuesta a esa comprobación.
+- **Pídeselo así**: el prompt que devuelve algo accionable.
+- **Para leer**: los recursos que merecen el tiempo.
+
+Los enlaces apuntan a la entrada canónica de cada recurso y no a páginas
+concretas. Las rutas profundas se rompen; las raíces no.
+
+## Estructura del repo
 
 ```
-your-project/
-  CLAUDE.md              # gitignored, entry point Claude reads automatically
-  Efficiency/            # gitignored, expanded profiles
-    rules-coding.md
-    rules-analysis.md
-    README.md
-  .gitignore             # tracked, gets two new lines appended
+book/triaje.html      # el libro completo, una sola página sin dependencias
+archive/              # trabajo previo, no mantenido
+
 ```
 
-Claude reads `CLAUDE.md` on every turn and pulls the matching profile from
-`Efficiency/` when the task calls for it.
+Para actualizarlo: edita `book/triaje.html` y republica sobre la misma URL.
 
-Nothing leaks to collaborators. The two paths are added to the project
-`.gitignore`.
+## Archivo
 
-## Install
+`archive/` guarda dos iteraciones anteriores del proyecto: un instalador que
+copiaba reglas dentro del repo destino, y después un marketplace de plugins de
+Claude Code. El contenido de aquellas skills y agentes es la materia prima de
+las fichas de este libro.
 
-### Linux / macOS (bash)
-
-From inside any target project directory:
-
-```bash
-bash /path/to/Albert-Efficient-Init/install.sh
-```
-
-Or pass an explicit target:
-
-```bash
-bash /path/to/Albert-Efficient-Init/install.sh /path/to/target/project
-```
-
-### Windows (PowerShell)
-
-From inside any target project directory:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File C:\path\to\Albert-Efficient-Init\install.ps1
-```
-
-Or pass an explicit target:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File C:\path\to\Albert-Efficient-Init\install.ps1 -Target C:\path\to\target\project
-```
-
-### One-liner directly from GitHub (no clone needed)
-
-> Replace `<USER>` with the GitHub user/org hosting this repo and `<BRANCH>`
-> with the branch (usually `main`).
-
-**Linux / macOS:**
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/<USER>/Albert-Efficient-Init/<BRANCH>/install.sh | bash
-```
-
-This grabs only the installer script. Because the installer also needs the
-template files, a clone-then-install flow is the most reliable. The full one
-liner:
-
-```bash
-git clone --depth 1 https://github.com/<USER>/Albert-Efficient-Init /tmp/aei && bash /tmp/aei/install.sh
-```
-
-**Windows:**
-
-```powershell
-git clone --depth 1 https://github.com/<USER>/Albert-Efficient-Init $env:TEMP\aei; powershell -ExecutionPolicy Bypass -File $env:TEMP\aei\install.ps1
-```
-
-### Idempotency
-
-Re-running the installer does not overwrite an existing `CLAUDE.md` and does
-not duplicate `.gitignore` entries. It is safe to re-run after pulling
-updates.
-
-## What's in it
-
-- `CLAUDE-root-template.md` -> installs as project root `CLAUDE.md`. Contains
-  the base rules.
-- `Efficiency/rules-coding.md` -> dev work, code review, debugging.
-- `Efficiency/rules-analysis.md` -> data analysis, reporting, research.
-
-The base rules are always active. Profiles are only loaded when the task
-matches.
-
-## Update an installed project
-
-Re-run the installer from the target. New profile files get copied in;
-existing files are preserved. To force-refresh, delete `Efficiency/` first
-and re-run.
-
-## Uninstall
-
-### Linux / macOS
-
-```bash
-bash /path/to/Albert-Efficient-Init/uninstall.sh
-# or against an explicit target:
-bash /path/to/Albert-Efficient-Init/uninstall.sh /path/to/target/project
-```
-
-### Windows
-
-```powershell
-powershell -ExecutionPolicy Bypass -File C:\path\to\Albert-Efficient-Init\uninstall.ps1
-# or against an explicit target:
-powershell -ExecutionPolicy Bypass -File C:\path\to\Albert-Efficient-Init\uninstall.ps1 -Target C:\path\to\target\project
-```
-
-The uninstaller removes `CLAUDE.md`, removes `Efficiency/`, and strips the
-matching block from the project `.gitignore`.
-
-## Why local-only
-
-The rules reflect personal preferences. Forcing them on collaborators
-creates friction. Keeping the files gitignored means each developer can pick
-their own setup.
-
-## For forks, merges, cherry-picks
-
-If you bring these files into another repository via fork, merge, or
-cherry-pick, run the installer once in that target repo. The installer
-appends the two paths to that repo's `.gitignore` so the files only act as
-local guides and never travel further with your commits.
+Si ejecutaste el instalador original en algún proyecto, límpialo con
+`bash archive/legacy/uninstall.sh /ruta/al/proyecto`.
 
 ## Attribution
 
-Derived from ideas in
+Parte de las ideas vienen de
 [drona23/claude-token-efficient](https://github.com/drona23/claude-token-efficient)
-(MIT). See [ATTRIBUTION.md](ATTRIBUTION.md).
+(MIT). Ver [ATTRIBUTION.md](ATTRIBUTION.md).
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. Ver [LICENSE](LICENSE).

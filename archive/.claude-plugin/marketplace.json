@@ -1,0 +1,62 @@
+{
+  "name": "aei",
+  "owner": {
+    "name": "Alberto Lopez",
+    "url": "https://github.com/Kevin-ToJoin"
+  },
+  "description": "Toolkit de reconocimiento y auditoria para aplicar sobre cualquier proyecto: nuevo, vivo, legacy o en mantenimiento.",
+  "version": "0.1.0",
+  "plugins": [
+    {
+      "name": "steering",
+      "displayName": "Steering eficiente",
+      "source": "./plugins/steering",
+      "description": "Reglas de respuesta concisa y perfiles de trabajo para desarrollo y analisis.",
+      "version": "0.1.0",
+      "category": "productivity",
+      "tags": ["steering", "estilo", "contexto"],
+      "license": "MIT"
+    },
+    {
+      "name": "recon",
+      "displayName": "Reconocimiento de proyecto",
+      "source": "./plugins/recon",
+      "description": "Clasifica un proyecto y emite un plan de auditoria priorizado.",
+      "version": "0.1.0",
+      "category": "analysis",
+      "tags": ["auditoria", "reconocimiento", "onboarding"],
+      "license": "MIT"
+    },
+    {
+      "name": "audit-security",
+      "displayName": "Auditoria de seguridad",
+      "source": "./plugins/audit-security",
+      "description": "Secretos en el historial, dependencias vulnerables y revision de autorizacion.",
+      "version": "0.1.0",
+      "category": "security",
+      "tags": ["seguridad", "secretos", "dependencias"],
+      "license": "MIT"
+    },
+    {
+      "name": "audit-quality",
+      "displayName": "Auditoria de calidad",
+      "source": "./plugins/audit-quality",
+      "description": "Codigo muerto, huecos de cobertura y salud de dependencias.",
+      "version": "0.1.0",
+      "category": "quality",
+      "tags": ["calidad", "cobertura", "mantenimiento"],
+      "license": "MIT"
+    },
+    {
+      "name": "audit-ui",
+      "displayName": "Auditoria de UI",
+      "source": "./plugins/audit-ui",
+      "description": "Recorrido de flujos y accesibilidad con Playwright. Arranca un navegador, activalo solo donde haga falta.",
+      "version": "0.1.0",
+      "category": "testing",
+      "tags": ["ui", "accesibilidad", "playwright"],
+      "license": "MIT",
+      "defaultEnabled": false
+    }
+  ]
+}

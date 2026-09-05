@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 #
-# Albert-Efficient-Init uninstaller
+# Albert-Efficient-Init uninstaller (DEPRECADO)
+#
+# Este script existe solo para limpiar proyectos donde se ejecuto el instalador
+# antiguo, que copiaba CLAUDE.md y Efficiency/ dentro del repo destino. Ese
+# modelo se sustituyo por plugins, que no tocan el repo destino.
+#
+# Se eliminara en la siguiente release. No hay nada nuevo que desinstalar con el.
 #
 # Removes the local rule files and strips the matching block from the target
 # project .gitignore.
@@ -53,8 +59,12 @@ if [ -f "$GITIGNORE" ]; then
     { print }
   ' "$GITIGNORE" > "$tmp"
 
-  # Collapse trailing blank lines.
-  awk 'NF { blanks=0; print; next } { blanks++; if (blanks==1) buf=$0; next } END { }' "$tmp" > "$GITIGNORE"
+  # Collapse trailing blank lines only. Interior blank lines are preserved:
+  # blanks are buffered and emitted only when more content follows.
+  awk '
+    /^[[:space:]]*$/ { pending++; next }
+    { while (pending > 0) { print ""; pending-- } print }
+  ' "$tmp" > "$GITIGNORE"
   rm -f "$tmp"
   echo "  clean  .gitignore"
 else

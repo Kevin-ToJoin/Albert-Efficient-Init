@@ -1,0 +1,13 @@
+{
+  "name": "audit-security",
+  "displayName": "Auditoria de seguridad",
+  "version": "0.1.0",
+  "description": "Secretos en el historial, dependencias vulnerables y revision de autorizacion.",
+  "author": {
+    "name": "Alberto Lopez",
+    "url": "https://github.com/Kevin-ToJoin"
+  },
+  "repository": "https://github.com/Kevin-ToJoin/Albert-Efficient-Init",
+  "license": "MIT",
+  "keywords": ["seguridad", "secretos", "dependencias"]
+}
