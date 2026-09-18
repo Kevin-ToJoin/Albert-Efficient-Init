@@ -8,6 +8,7 @@ skills/     comandos como /finalizar     -> se enganchan a ~/.claude/skills
 hooks/      scripts + cómo registrarlos  -> requieren una entrada en settings.json
 rules/      CLAUDE.md + perfiles         -> se copian al proyecto que los quiera
 docs/       cómo escribir lo de arriba
+CLAUDE.md   cómo trabajar en este repo   -> importa la plantilla de rules/
 ```
 
 ## Engancharlo (una sola vez)
