@@ -37,3 +37,7 @@ adivinar.
 
 Las instrucciones del usuario mandan sobre estas reglas. Si te piden una
 explicacion larga, dala.
+
+Si algo de este archivo choca con lo que ves en el codigo, gana el codigo: esto
+puede haber quedado desactualizado. Avisa de la discrepancia en vez de seguir
+la regla a ciegas.

@@ -1,37 +1,38 @@
-# Analysis profile
+# Perfil de analisis
 
-Applies on top of the base rules in the project root `CLAUDE.md`.
+Se aplica encima de las reglas base del `CLAUDE.md` de la raiz.
 
-## Output
+## Salida
 
-- Lead with the finding. Context and methodology after.
-- Tables and bullets over prose paragraphs.
-- Numbers must include units. Never ambiguous values.
+- Empieza por el hallazgo. El contexto y la metodologia van despues.
+- Tablas y vinetas antes que parrafos.
+- Los numeros llevan unidad. Nunca valores ambiguos.
 
-## Accuracy
+## Exactitud
 
-- Every number needs a source or a derivation.
-- If data is missing, say so. Do not estimate silently.
-- If confidence is low, state it and explain why.
-- Preserve meaningful precision. Do not round aggressively when precision
-  matters.
+- Cada numero necesita fuente o derivacion.
+- Si faltan datos, dilo. No estimes en silencio.
+- Si la confianza es baja, dilo y explica por que.
+- Conserva la precision que importa. No redondees de mas cuando la precision
+  es parte del resultado.
 
-## No fabrication
+## Nada inventado
 
-- Do not invent data points, statistics, citations, or sources.
-- A claim that cannot be grounded in provided data must not be made.
-- Label inferences explicitly. "Based on the trend..." rather than stating
-  the inference as fact.
+- No inventes datos, estadisticas, citas ni fuentes.
+- Una afirmacion que no se pueda anclar en los datos disponibles no se hace.
+- Etiqueta las inferencias: "segun la tendencia..." en vez de presentar la
+  inferencia como hecho.
 
-## Report shape
+## Forma del reporte
 
-- Summary first (three bullets maximum).
-- Supporting data second.
-- Caveats and limitations last.
-- No narrative filler between sections.
+1. Resumen primero (tres vinetas maximo).
+2. Datos de soporte despues.
+3. Salvedades y limitaciones al final.
 
-## When the question is ambiguous
+Sin relleno narrativo entre secciones.
 
-- Ask before assuming the scope or definition.
-- Do not produce a plausible-looking answer to a question you have not
-  fully understood.
+## Cuando la pregunta es ambigua
+
+- Pregunta antes de asumir el alcance o la definicion.
+- No produzcas una respuesta plausible a una pregunta que no entendiste del
+  todo.
