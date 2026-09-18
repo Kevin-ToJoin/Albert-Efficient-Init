@@ -4,20 +4,22 @@ Carpeta de comandos, hooks y reglas para Claude Code. Sin instalador: clonas el
 repo, lo enganchas una vez, y a partir de ahí **actualizar es `git pull`**.
 
 ```
-skills/     comandos como /finalizar     -> se enganchan a ~/.claude/skills
-hooks/      scripts + cómo registrarlos  -> requieren una entrada en settings.json
-rules/      CLAUDE.md + perfiles         -> se copian al proyecto que los quiera
+skills/     comandos como /finalizar      -> se enganchan a ~/.claude/skills
+agents/     subagentes como auditor-deuda -> se enganchan a ~/.claude/agents
+hooks/      scripts + cómo registrarlos   -> requieren una entrada en settings.json
+rules/      CLAUDE.md + perfiles          -> se copian al proyecto que los quiera
 docs/       cómo escribir lo de arriba
-CLAUDE.md   cómo trabajar en este repo   -> importa la plantilla de rules/
+CLAUDE.md   cómo trabajar en este repo    -> importa la plantilla de rules/
 ```
 
 ## Engancharlo (una sola vez)
 
-Clona donde quieras y enlaza `skills/` dentro de `~/.claude/`:
+Clona donde quieras y enlaza `skills/` y `agents/` dentro de `~/.claude/`:
 
 ```powershell
 git clone https://github.com/Kevin-ToJoin/Albert-Efficient-Init.git
 New-Item -ItemType Junction -Path "$HOME\.claude\skills" -Target "<ruta-al-repo>\skills"
+New-Item -ItemType Junction -Path "$HOME\.claude\agents" -Target "<ruta-al-repo>\agents"
 ```
 
 En macOS o Linux:
@@ -25,11 +27,12 @@ En macOS o Linux:
 ```bash
 git clone https://github.com/Kevin-ToJoin/Albert-Efficient-Init.git
 ln -s "<ruta-al-repo>/skills" ~/.claude/skills
+ln -s "<ruta-al-repo>/agents" ~/.claude/agents
 ```
 
-Y ya: `/finalizar` funciona en **cualquier** repo que abras. Cuando agregues o
-edites un comando, `git pull` y está disponible al instante — no hay copia que
-re-hacer.
+Y ya: `/finalizar` y `@agent-auditor-deuda` funcionan en **cualquier** repo que
+abras. Cuando agregues o edites uno, `git pull` y está disponible al instante —
+no hay copia que re-hacer.
 
 > Una junction de Windows no necesita permisos de admin y funciona entre
 > unidades distintas (el repo en `E:`, tu home en `C:`). Borrarla con
@@ -68,6 +71,24 @@ que ya quedó escrito en `deuda-tecnica.md` (refactors, tests, TODOs).
 
 Nunca hace `push --force`, y ante un conflicto aborta el merge, te devuelve a tu
 rama y te lo dice en lugar de resolverlo por su cuenta.
+
+## Los subagentes
+
+Corren en **su propia ventana de contexto** y te devuelven solo el resultado,
+para que el trabajo pesado de exploración no te ensucie la conversación
+principal.
+
+### `@agent-auditor-deuda`
+
+Barre el repo buscando `TODO`/`FIXME`/`HACK`, tests saltados y trabajo a
+medias, lo cruza contra `deuda-tecnica.md` y te reporta **solo lo que no está
+registrado**. Complementa a `/finalizar`, que solo conoce la sesión actual.
+
+Si no encuentra nada responde `Todo registrado.` y ya. No escribe en ningún
+archivo: reporta, y quien registra es `/finalizar`.
+
+El formato, el frontmatter completo y las trampas están en
+[agents/README.md](agents/README.md).
 
 ## Los hooks
 
