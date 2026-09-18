@@ -9,17 +9,14 @@ es trabajo que un agente puede hacer solo.
 
 ## Abiertos
 
-- [ ] [M] Verificar `install.ps1` y `uninstall.ps1` en Windows. Se escribieron
-      para paridad con los de bash pero nunca se ejecutaron: no hay PowerShell
-      en el contenedor donde se desarrollaron. La paridad es por inspeccion, no
-      probada.
 - [ ] [A] No hay CI. Un workflow que corra `bash -n` sobre los tres scripts,
       `claude plugin validate` sobre el plugin y el marketplace, y el
       extract-and-run del bloque `!` en los cuatro estados de repo, evitaria
       regresiones silenciosas. - `.github/workflows/` (no existe)
-- [ ] [A] Las pruebas de instalador y desinstalador fueron manuales en un
-      sandbox; no quedaron como script reejecutable. Convertir esa secuencia en
-      `tests/install_test.sh` para poder correrla desde el CI de arriba.
+- [ ] [A] Las pruebas de instalador y desinstalador de bash fueron manuales en
+      un sandbox; no quedaron como script reejecutable. Convertir esa secuencia
+      en `tests/install_test.sh` (analogo al `tests/install_test.ps1` que ya
+      existe para PowerShell) para poder correrla desde el CI de arriba.
 - [ ] [A] `/finalizar` nunca se ha ejecutado como slash command real. Se probo
       su bloque `!` por separado y el procedimiento se ejecuto a mano. Falta una
       corrida de punta a punta despues de instalarlo con
@@ -43,6 +40,16 @@ es trabajo que un agente puede hacer solo.
 
 ## Cerrados
 
+- [x] 2026-09-18 - Verificados `install.ps1` y `uninstall.ps1` en Windows
+      PowerShell 5.1 real (antes solo probados por inspeccion, sin PowerShell
+      disponible). Los 4 modos de enganche, la idempotencia, `-Force`, `-List`,
+      el merge de `settings.json` preservando claves ajenas y el guard de JSON
+      invalido funcionan igual que la version bash, incluso con espacios en la
+      ruta (el caso real de este usuario en Windows). Encontrada y corregida
+      una brecha de paridad: `uninstall.ps1` no borraba el directorio
+      `skills` si quedaba vacio (bash si lo hace via
+      `rmdir ... || true`). Arnes de pruebas reejecutable en
+      `tests/install_test.ps1`. - `uninstall.ps1`
 - [x] 2026-09-18 - `git log HEAD --not main master` fallaba entero si `master`
       no existia, devolviendo vacio en cualquier repo moderno. Encadenado con
       `||` por rama.

@@ -79,6 +79,10 @@ function Remove-Skills {
         Write-Host "  skip   $($_.Name)/ (no estaba)"
       }
     }
+
+  if ((Test-Path $destRoot) -and -not (Get-ChildItem -Path $destRoot -Force -ErrorAction SilentlyContinue)) {
+    Remove-Item -Path $destRoot -Force -ErrorAction SilentlyContinue
+  }
   Write-Host ''
 }
 
