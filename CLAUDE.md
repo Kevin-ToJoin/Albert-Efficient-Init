@@ -1,3 +1,42 @@
+<!--
+QUE VA EN ESTE ARCHIVO
+======================
+
+Claude Code lo lee entero al arrancar cada sesion y lo pega a tu prompt. Es el
+guion de onboarding del repo: lo que le explicarias a alguien nuevo para que no
+tenga que adivinar ni re-explorar todo.
+
+Este es el CLAUDE.md a nivel proyecto, va commiteado y aplica a quien abra este
+repo. El personal tuyo, que aplica a todos tus proyectos, seria
+~/.claude/CLAUDE.md (hoy no existe). Los dos se concatenan, no se pisan.
+
+VA AQUI
+  - Que es el proyecto y con que esta hecho: stack, decisiones grandes.
+  - Los comandos del dia a dia: levantar, testear, lintear, desplegar.
+  - Convenciones de codigo y de commits que no se deducen leyendo el repo.
+  - Trampas: lo que alguien nuevo romperia sin saber que existia.
+  - Correcciones que ya tuviste que repetir mas de una vez.
+
+NO VA AQUI
+  - Lo que se deduce leyendo el codigo o el git log.
+  - Documentacion larga: enlazala, o importala con `@ruta` si debe estar
+    siempre en contexto.
+  - Estado temporal de la tarea de hoy.
+  - Sedimento: si una regla ya no es cierta, borrala. Una regla vieja hace mas
+    dano que ninguna.
+
+REGLAS DE ORO
+  - Menos de 200 lineas. Mas largo gasta mas contexto y se obedece menos.
+    Ojo: lo que entra por un `@import` tambien cuenta.
+  - Concreto y verificable. "Indentacion de 2 espacios", no "formatea bien".
+  - Sin reglas que se contradigan: ante un choque Claude elige una al azar.
+  - Empieza corto y agrega una regla cuando te descubras corrigiendo lo mismo
+    dos veces. No lo escribas "por si acaso".
+
+Este bloque es un comentario HTML: Claude Code los quita antes de inyectar el
+archivo, asi que no gasta contexto. Las notas para humanos van aqui.
+-->
+
 # Albert-Efficient-Init
 
 Toolkit personal de comandos, hooks y reglas para Claude Code. El repo es
