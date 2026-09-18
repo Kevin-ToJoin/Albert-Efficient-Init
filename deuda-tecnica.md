@@ -13,6 +13,15 @@ es trabajo que un agente puede hacer solo.
       su bloque `!` por separado y el procedimiento se ejecuto a mano. Falta una
       corrida de punta a punta despues de engancharlo con la
       junction. - `skills/finalizar/SKILL.md`
+- [ ] [A] `auditor-deuda` nunca se ha ejecutado. Se escribio contra la
+      referencia de subagentes pero no se ha invocado ni una vez, asi que no se
+      sabe si el reporte sale en el formato pedido ni si el cruce contra
+      `## Abiertos` filtra bien. - `agents/auditor-deuda.md`
+- [ ] [A] El campo `memory: project` de `auditor-deuda` esta puesto sin
+      verificar. La referencia lo documenta como alcance de memoria persistente
+      pero no describe como escribe el agente en ella; hace falta comprobar en
+      dos sesiones distintas si de verdad recuerda algo. Si no funciona, el
+      unico efecto es que no recuerda nada. - `agents/auditor-deuda.md:7`
 - [ ] [A] Confirmar que `allowed-tools: Bash(git *) ...` pre-aprueba de verdad.
       La doc de slash commands usa esa forma con espacio; la de permisos en
       `settings.json` usa `Bash(git:*)` con dos puntos. Si la forma es
@@ -84,7 +93,16 @@ para que las reglas base tengan una sola fuente en vez de dos copias que se
 desincronizan. La plantilla se reescribio en espanol y se dejo autocontenida,
 que es requisito para poder copiarla sola a otro proyecto.
 
-Nuevos pendientes: 2 | Cerrados: 3
+Despues se sumo `agents/`, cuarta carpeta y segunda junction, con
+`auditor-deuda`: barre el repo y reporta solo la deuda que no esta ya en este
+archivo. Se le quitaron `Write` y `Edit` a proposito, para que el unico que
+escriba aqui siga siendo `/finalizar`.
+
+De paso, la leccion del curso que describe `/agents` con asistente de creacion
+va por detras: desde la v2.1.198 ese asistente no existe, y aqui corre la
+2.1.201.
+
+Nuevos pendientes: 4 | Cerrados: 3
 
 ### 2026-09-18 - rama `claude/webhook-finalizar-setup-yiu5os`
 

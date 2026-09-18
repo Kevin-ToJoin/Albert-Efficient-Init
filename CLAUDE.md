@@ -70,7 +70,7 @@ marcado legacy frente a `skills/<n>/SKILL.md`; `$HOME` es de solo lectura en
 PowerShell 5.1; y los hooks no pueden ser file-drop, siempre necesitan una
 entrada en `settings.json`.
 
-## Tres carpetas, tres mecanicas distintas
+## Cuatro carpetas, tres mecanicas distintas
 
 Es lo que mas se presta a error. Cada una llega a Claude Code por una via
 diferente:
@@ -78,6 +78,7 @@ diferente:
 | Carpeta | Como llega | Implicacion |
 |---|---|---|
 | `skills/` | Junction: `~/.claude/skills` apunta aqui | Editar un `SKILL.md` cambia el comando **en vivo y en todos los repos** del usuario |
+| `agents/` | Junction: `~/.claude/agents` apunta aqui | Igual que las skills. Los archivos sin `name` en el frontmatter se ignoran como documentacion |
 | `hooks/` | No llega sola | Necesita una entrada en `settings.json`. No existe carpeta auto-cargable |
 | `rules/` | No llega sola | Se copia a mano al proyecto que la quiera |
 
@@ -95,6 +96,13 @@ diferente:
 - **Los hooks tienen una alternativa file-drop**: declararlos en el frontmatter
   de una skill. Esos si viajan con un `git pull` y no tocan ningun
   `settings.json`.
+- **Una skill no es un agente.** Una skill es un procedimiento que se inyecta
+  en *esta* conversacion y admite bloques ` ```! `. Un agente corre en su
+  propio contexto, no ve nada de la conversacion, y su cuerpo es un system
+  prompt que **no ejecuta nada**: los bloques `!` ahi no hacen lo que parece.
+- **Cada subagente carga los `CLAUDE.md` completos** salvo que lleve
+  `omitClaudeMd: true`. Este archivo entra en su contexto tambien, asi que
+  mantenerlo corto importa mas de lo que parece.
 
 ## La unica verificacion que existe
 
