@@ -15,10 +15,26 @@ Las que este repo distribuye a otros proyectos, aplicadas aqui tambien:
 Con una correccion de ruta: aqui los perfiles viven en `rules/Efficiency/`, no
 en `Efficiency/`.
 
+## Antes de afirmar como funciona Claude Code
+
+El tema de este repo *es* la configuracion de Claude Code, asi que una
+suposicion equivocada no se queda en un bug: se convierte en documentacion
+equivocada que despues se copia a otros repos.
+
+**Verifica en la documentacion antes de afirmar** como funcionan las skills,
+los hooks, `settings.json`, los permisos o los imports de `CLAUDE.md`. No
+respondas de memoria. La URL vigente es `https://code.claude.com/docs/en/` —
+las de `docs.claude.com/en/docs/claude-code/` redirigen ahi.
+
+Tres supuestos que ya salieron falsos en este repo: `commands/*.md` esta
+marcado legacy frente a `skills/<n>/SKILL.md`; `$HOME` es de solo lectura en
+PowerShell 5.1; y los hooks no pueden ser file-drop, siempre necesitan una
+entrada en `settings.json`.
+
 ## Tres carpetas, tres mecanicas distintas
 
-Es lo que mas se presta a error en este repo. Cada una llega a Claude Code por
-una via diferente:
+Es lo que mas se presta a error. Cada una llega a Claude Code por una via
+diferente:
 
 | Carpeta | Como llega | Implicacion |
 |---|---|---|
@@ -33,21 +49,47 @@ una via diferente:
   esta en la bitacora de `deuda-tecnica.md`. Actualizar es `git pull`.
 - **Un comando es un directorio con `SKILL.md`**, no un `.md` suelto. El nombre
   del comando sale del directorio, no del campo `name` del frontmatter.
-- **Los bloques ` ```! ` abortan el comando entero si salen != 0.** Se ejecutan
-  antes de que Claude vea la skill. Termina siempre en `true` y protege cada
-  linea con `||`. Pruebalos en cuatro estados: repo normal, repo sin `main` ni
-  `master`, directorio que no es git, y repo sin ningun commit. El metodo esta
-  en `docs/comandos.md`.
 - **`rules/CLAUDE-root-template.md` se llama asi a proposito.** Si se llamara
   `CLAUDE.md`, Claude Code lo auto-cargaria al trabajar dentro de `rules/`. No
-  lo renombres.
+  lo renombres. Ademas el `CLAUDE.md` de la raiz lo importa, asi que editarlo
+  cambia tambien como se comporta Claude aqui.
 - **Los hooks tienen una alternativa file-drop**: declararlos en el frontmatter
   de una skill. Esos si viajan con un `git pull` y no tocan ningun
   `settings.json`.
 
-## Al terminar
+## La unica verificacion que existe
 
-`deuda-tecnica.md` lo mantiene el comando `/finalizar`. Lo que quede a medias,
-sin verificar o decidido a medias va ahi, con `[M]` si requiere accion manual
-del usuario o `[A]` si un agente puede cerrarlo solo. No lo reportes en el chat
-si ya quedo escrito en el archivo.
+No hay tests, pero los bloques ` ```! ` de una skill se ejecutan **antes** de
+que Claude la vea, y **si salen != 0 abortan la invocacion entera**. Termina
+siempre en `true` y protege cada linea con `||`.
+
+Antes de commitear un comando, extrae el bloque y correlo:
+
+```bash
+awk '/^```!$/{f=1;next} f&&/^```$/{exit} f' skills/<nombre>/SKILL.md > /tmp/probe.sh
+bash /tmp/probe.sh; echo "EXIT=$?"
+```
+
+En cuatro estados: repo normal con rama de trabajo, repo sin `main` ni
+`master`, directorio que no es git, y repo sin ningun commit. Los cuatro deben
+dar `EXIT=0`.
+
+## Entorno
+
+- **PowerShell 5.1 Desktop**, sin `pwsh` 7. Los scripts de `hooks/` no pueden
+  usar `&&`, `||` como encadenadores, ternarios ni `??`. `$HOME` es de solo
+  lectura: para aislarlo en una prueba, lanza un proceso hijo con
+  `$env:USERPROFILE` cambiado.
+- **Sin `gh` CLI.** No hay flujo de PRs desde aqui: commit local y push.
+- Las rutas reales del usuario llevan espacios. Cita siempre.
+
+## Commits y cierre
+
+- Mensajes en espanol, imperativo, una linea de asunto y cuerpo que explique el
+  **por que**, no el que. Sin prefijos de herramienta.
+- **Sin linea `Co-Authored-By`.** El historial no la usa; no la agregues.
+- Nunca hagas push sin confirmarlo antes con el usuario.
+- `deuda-tecnica.md` lo mantiene el comando `/finalizar`. Lo que quede a medias,
+  sin verificar o decidido a medias va ahi, con `[M]` si requiere accion manual
+  del usuario o `[A]` si un agente puede cerrarlo solo. No lo repitas en el chat
+  si ya quedo escrito en el archivo.

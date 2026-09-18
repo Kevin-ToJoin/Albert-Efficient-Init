@@ -1,36 +1,36 @@
-# Coding profile
+# Perfil de codigo
 
-Applies on top of the base rules in the project root `CLAUDE.md`.
+Se aplica encima de las reglas base del `CLAUDE.md` de la raiz.
 
-## Output
+## Salida
 
-- Code first. Explanation only if the logic is non-obvious or the user asks.
-- No boilerplate unless requested.
-- Do not add comments, docstrings, or type annotations to code that is not
-  being changed.
+- Primero el codigo. Explicacion solo si la logica no es obvia o si se pide.
+- Sin boilerplate salvo que se pida.
+- No agregues comentarios, docstrings ni anotaciones de tipo a codigo que no
+  estas cambiando.
 
-## Code style
+## Estilo
 
-- Simplest working solution. No abstraction for single-use logic.
-- Three similar lines is better than a premature helper function.
-- No speculative features.
-- Read the file before editing it.
-- No error handling for cases that cannot occur. Validate at boundaries
-  (user input, external APIs), trust internal calls.
+- La solucion mas simple que funcione. Sin abstraer logica de un solo uso.
+- Tres lineas parecidas son mejores que un helper prematuro.
+- Sin features especulativas.
+- Lee el archivo antes de editarlo.
+- Sin manejo de errores para casos que no pueden ocurrir. Valida en los bordes
+  (input del usuario, APIs externas) y confia en las llamadas internas.
 
 ## Code review
 
-- State the bug. Show the fix. Stop.
-- No suggestions outside the scope of the change.
-- No compliments before or after the review.
+- Di cual es el bug. Muestra el arreglo. Para.
+- Sin sugerencias fuera del alcance del cambio.
+- Sin cumplidos antes ni despues de la revision.
 
 ## Debugging
 
-- Read the relevant code before forming a hypothesis.
-- Report what was found, where, and the fix. One pass.
-- If the cause is unclear, say so. Do not guess at a fix.
+- Lee el codigo relevante antes de formular una hipotesis.
+- Reporta que encontraste, donde, y el arreglo. Una pasada.
+- Si la causa no esta clara, dilo. No adivines un arreglo.
 
-## When refactoring
+## Refactors
 
-- Only refactor what was requested. Do not bundle drive-by cleanups.
-- Preserve behavior unless the user asked for a behavior change.
+- Refactoriza solo lo que se pidio. Nada de limpiezas de paso.
+- Preserva el comportamiento salvo que se haya pedido cambiarlo.
