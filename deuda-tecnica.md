@@ -78,6 +78,12 @@ admin y que borrarla no toca el target. Confirmado en la doc que los hooks no
 pueden ser file-drop: siempre necesitan una entrada en `settings.json`, salvo
 los declarados en el frontmatter de una skill, que si viajan con el repo.
 
+Ademas, el repo gana su primer `CLAUDE.md`: importa con `@` la plantilla que
+distribuye (`rules/CLAUDE-root-template.md`) y le suma las mecanicas propias,
+para que las reglas base tengan una sola fuente en vez de dos copias que se
+desincronizan. La plantilla se reescribio en espanol y se dejo autocontenida,
+que es requisito para poder copiarla sola a otro proyecto.
+
 Nuevos pendientes: 2 | Cerrados: 3
 
 ### 2026-09-18 - rama `claude/webhook-finalizar-setup-yiu5os`

@@ -1,29 +1,39 @@
-# Project rules (Albert-Efficient-Init, local-only)
+# Reglas base
 
-This file and the `Efficiency/` folder are gitignored. They reflect the local
-developer's preferences and do not affect collaborators.
+## Conducta
 
-## Base rules
+- Lee los archivos antes de escribir sobre ellos. No releas el mismo archivo en
+  una sesion salvo que haya podido cambiar.
+- Salida concisa, razonamiento a fondo. Breve esta bien; mudo no.
+- Sin aperturas aduladoras, sin relleno de cierre, sin repetir la pregunta.
+- Sin em-dashes ni Unicode decorativo. Guiones normales y comillas rectas.
+- Nunca inventes APIs, flags, versiones, rutas, SHAs ni nombres de paquete.
+  Verifica leyendo el codigo o la documentacion antes de afirmar.
+- Si no ejecutaste algo, dilo. "Deberia funcionar" no es "lo probe".
+- Salta archivos de mas de 100KB salvo que la tarea los pida.
 
-- Read existing files before writing. Do not re-read a file in the same
-  session unless it may have changed.
-- Concise output, thorough reasoning. Brief is good; silent is not.
-- No sycophantic openers, no closing fluff, no restating of the question.
-- No em-dashes or decorative Unicode. Plain hyphens and straight quotes only.
-- Never invent APIs, flags, versions, paths, commit SHAs, or package names.
-  Verify by reading code or documentation before asserting.
-- Skip files over 100KB unless the task requires them.
-- User instructions always override these rules. If asked for a long
-  explanation, give one.
+## Alcance
 
-## Profiles
+- Haz lo que se pidio. Ni refactors de paso, ni abstracciones para un futuro
+  hipotetico, ni manejo de errores para casos que no pueden pasar.
+- Sin comentarios que expliquen *que* hace el codigo. Solo cuando el *por que*
+  no sea obvio: una restriccion oculta, un workaround, algo que sorprenderia.
+- No crees archivos de planificacion, resumen o analisis salvo que se pidan.
+- Antes de algo destructivo o dificil de revertir (borrar, force push, reset,
+  tocar estado compartido), pregunta.
 
-Read the matching profile only if the task calls for it:
+## Perfiles
 
-- `Efficiency/rules-coding.md` for development, code review, debugging, and
-  refactoring tasks.
-- `Efficiency/rules-analysis.md` for data analysis, research, and reporting
-  tasks.
+Lee el perfil que corresponda solo si la tarea lo pide, no por defecto:
 
-If the task is mixed or unclear, ask which profile to use rather than
-guessing.
+- `Efficiency/rules-coding.md` para desarrollo, code review, debugging y
+  refactors.
+- `Efficiency/rules-analysis.md` para analisis de datos, research y reporting.
+
+Si la tarea es mixta o no esta clara, pregunta que perfil usar en vez de
+adivinar.
+
+## Prioridad
+
+Las instrucciones del usuario mandan sobre estas reglas. Si te piden una
+explicacion larga, dala.

@@ -11,6 +11,13 @@ rules/CLAUDE-root-template.md   ->  <proyecto>/CLAUDE.md
 rules/Efficiency/               ->  <proyecto>/Efficiency/
 ```
 
+> **Ojo al editar la plantilla.** El `CLAUDE.md` de la raiz de este repo la
+> importa con `@rules/CLAUDE-root-template.md`, asi que un cambio ahi tambien
+> cambia como se comporta Claude Code trabajando *en este* repo. Es a proposito:
+> una sola fuente, y comemos de nuestra propia comida. La plantilla tiene que
+> seguir siendo **autocontenida**, porque cuando viaja a otro proyecto va sola y
+> ahi no hay nada que importar.
+
 ## Copiarlas a un proyecto
 
 ```powershell
