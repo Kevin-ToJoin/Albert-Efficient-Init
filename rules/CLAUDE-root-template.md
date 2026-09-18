@@ -1,3 +1,43 @@
+<!--
+QUE VA EN ESTE ARCHIVO
+======================
+
+Esto es un CLAUDE.md: Claude Code lo lee entero al arrancar cada sesion y lo
+pega a tu prompt. Es el guion de onboarding del proyecto.
+
+Llega con las reglas base de conducta, que son iguales en todos lados. Lo que
+sigue es tuyo: debajo agrega lo especifico de ESTE proyecto, que es donde esta
+el valor real. Un CLAUDE.md sin nada del proyecto apenas sirve.
+
+AGREGA DEBAJO
+  - Que es el proyecto y con que esta hecho: stack, version, decisiones grandes.
+  - Los comandos del dia a dia: levantar, testear, lintear, desplegar.
+  - Convenciones de codigo y de commits que no se deducen leyendo el repo.
+  - Trampas: lo que alguien nuevo romperia sin saber que existia.
+  - Correcciones que ya tuviste que repetir mas de una vez.
+
+NO AGREGUES
+  - Lo que se deduce leyendo el codigo o el git log.
+  - Documentacion larga: enlazala, o importala con `@ruta` si debe estar
+    siempre en contexto.
+  - Estado temporal de la tarea de hoy.
+  - Reglas que ya no son ciertas. Una regla vieja hace mas dano que ninguna.
+
+REGLAS DE ORO
+  - Menos de 200 lineas. Mas largo gasta mas contexto y se obedece menos.
+  - Concreto y verificable. "Indentacion de 2 espacios", no "formatea bien".
+  - Sin reglas que se contradigan: ante un choque Claude elige una al azar.
+  - Empieza corto y agrega una regla cuando te descubras corrigiendo lo mismo
+    dos veces. No lo escribas "por si acaso".
+
+Este archivo y la carpeta Efficiency/ van gitignoreados: son tu preferencia
+personal, no la del equipo. Si quieres que aplique a todos tus proyectos a la
+vez, ponlo en ~/.claude/CLAUDE.md en vez de aqui.
+
+Este bloque es un comentario HTML: Claude Code los quita antes de inyectar el
+archivo, asi que no gasta contexto.
+-->
+
 # Reglas base
 
 ## Conducta
