@@ -1,0 +1,21 @@
+{
+  "name": "albert-efficient",
+  "owner": {
+    "name": "Kevin-ToJoin",
+    "url": "https://github.com/Kevin-ToJoin"
+  },
+  "description": "Comandos de cierre de sesion y perfiles de reglas token-efficient para Claude Code.",
+  "plugins": [
+    {
+      "name": "albert",
+      "source": "./plugins/albert",
+      "description": "Comandos de workflow: /finalizar cierra la sesion (merge a main + deuda tecnica) y reporta solo lo que requiere accion manual.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Kevin-ToJoin"
+      },
+      "category": "productivity",
+      "keywords": ["git", "merge", "technical-debt", "workflow", "spanish"]
+    }
+  ]
+}

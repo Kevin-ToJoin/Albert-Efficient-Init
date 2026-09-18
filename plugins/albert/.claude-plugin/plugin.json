@@ -1,0 +1,13 @@
+{
+  "name": "albert",
+  "description": "Comandos de workflow para cerrar sesiones de trabajo: merge a la rama base, registro de deuda tecnica, y reporte minimo (solo pendientes manuales).",
+  "version": "0.1.0",
+  "author": {
+    "name": "Kevin-ToJoin",
+    "url": "https://github.com/Kevin-ToJoin"
+  },
+  "homepage": "https://github.com/Kevin-ToJoin/Albert-Efficient-Init",
+  "repository": "https://github.com/Kevin-ToJoin/Albert-Efficient-Init",
+  "license": "MIT",
+  "keywords": ["git", "merge", "technical-debt", "workflow"]
+}
