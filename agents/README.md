@@ -18,6 +18,56 @@ ln -s "<ruta-al-repo>/agents" ~/.claude/agents
 > archivos que no llevan `name` en el frontmatter y los trata como
 > documentacion.
 
+## Que guardar aqui
+
+La ganancia de un subagente es una sola: el camino para llegar a la respuesta
+no te ocupa contexto, solo la respuesta. Ese es tambien el criterio para
+decidir si algo merece ser un agente.
+
+### Va aqui
+
+- **Exploracion que ensucia.** Barrer el repo, leer veinte archivos, buscar en
+  la web. Gasta muchisimo contexto y devuelve un parrafo.
+- **Tareas repetibles con salida fija.** Una auditoria, un inventario, un
+  informe que siempre tiene la misma forma.
+- **Trabajo en paralelo o en background**, mientras tu sigues con lo tuyo.
+- **Segundas opiniones sin sesgo.** Como no ve la conversacion, no arrastra tus
+  suposiciones ni las suyas anteriores. Para revisar algo eso es una ventaja,
+  no una limitacion.
+
+### No va aqui
+
+- **Lo que necesita el contexto de la conversacion.** El subagente no ve el
+  historial, ni los archivos que Claude ya leyo, ni las skills ya invocadas. Si
+  la tarea depende de eso, es una **skill**, no un agente.
+- **Un procedimiento que quieres seguir tu**, viendo cada decision. Skill.
+- **Tareas de un paso.** Delegar cuesta un arranque entero; para un `grep` sale
+  mas caro que hacerlo.
+- **Lo que ya hacen los agentes integrados** (`Explore`, `Plan`). Duplicarlos
+  solo crea ambiguedad sobre cual acaba usando Claude.
+
+### Skill, agente o hook
+
+| Quieres... | Es un... |
+|---|---|
+| Un procedimiento que invocas con `/algo` en esta conversacion | skill, en `skills/` |
+| Delegar trabajo pesado y recibir solo el resultado | agente, en `agents/` |
+| Que algo pase solo al ocurrir un evento, sin pedirlo | hook, en `hooks/` |
+
+### Reglas de oro
+
+- **La `description` es lo que decide** si Claude delega. Escribe *cuando*
+  usarlo, no solo que hace.
+- **Recorta `tools` al minimo.** Quitar `Write` y `Edit` es como se garantiza
+  que un agente solo lea.
+- **Di que NO reportar**, y que responder cuando no encuentra nada. Un agente
+  que resume de mas anula la ganancia de contexto, que era todo el punto.
+- **Todo lo que necesite saber va en su prompt.** No puede preguntarte a mitad
+  del trabajo.
+- **Empieza sin agente.** Crea uno cuando te descubras pidiendo la misma
+  exploracion por tercera vez. Un agente escrito "por si acaso" no se usa y
+  compite con los que si.
+
 ## Catalogo
 
 | Agente | Para que |
