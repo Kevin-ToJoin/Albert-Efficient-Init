@@ -6,11 +6,16 @@ repo, lo enganchas una vez, y a partir de ahí **actualizar es `git pull`**.
 ```
 skills/     comandos como /finalizar      -> se enganchan a ~/.claude/skills
 agents/     subagentes como auditor-deuda -> se enganchan a ~/.claude/agents
-hooks/      scripts + cómo registrarlos   -> requieren una entrada en settings.json
+hooks/      scripts deterministas         -> requieren una entrada en settings.json
+mcp/        plantillas de .mcp.json       -> se copian al proyecto que los quiera
 rules/      CLAUDE.md + perfiles          -> se copian al proyecto que los quiera
 docs/       cómo escribir lo de arriba
 CLAUDE.md   cómo trabajar en este repo    -> importa la plantilla de rules/
 ```
+
+Cada carpeta lleva su propio README con **qué merece guardarse ahí y qué no**,
+para que la decisión de "¿esto es una skill, un agente o un hook?" no haya que
+volver a razonarla cada vez.
 
 ## Engancharlo (una sola vez)
 
@@ -92,11 +97,37 @@ El formato, el frontmatter completo y las trampas están en
 
 ## Los hooks
 
-Un hook dispara un comando tuyo cuando pasa algo en la sesión (antes de una
-herramienta, al terminar un turno, al arrancar). A diferencia de los comandos,
-**no basta con dejar el archivo en una carpeta**: hay que registrarlo en un
-`settings.json`. Los scripts viven en [hooks/](hooks/) y ahí está el bloque JSON
-para pegar. Ver [hooks/README.md](hooks/README.md).
+Lo que los distingue de todo lo demás: **son deterministas**. Una regla del
+`CLAUDE.md` se cumple casi siempre; un hook se cumple siempre.
+
+### `guard-git-destructivo.ps1`
+
+Bloquea `git push --force`, `reset --hard`, `clean -f` y `branch -D` antes de
+que se ejecuten, y le explica a Claude por qué y qué hacer en su lugar. Deja
+pasar las variantes seguras: `--force-with-lease`, `clean -n`, `branch -d`.
+
+Es el ejemplo de por qué existen los hooks: `/finalizar` ya lleva escrito en su
+prompt que nunca haga force push, y casi siempre lo cumple. El hook lo vuelve
+imposible.
+
+Falla abierto — si no entiende su entrada, deja pasar. Tiene 20 pruebas, la
+mitad dedicadas a comprobar lo que **no** debe bloquear.
+
+A diferencia de los comandos, **no basta con dejar el archivo en la carpeta**:
+hay que registrarlo en un `settings.json`. El bloque para pegar y la guía de
+cuándo escribir un hook están en [hooks/README.md](hooks/README.md).
+
+## Los MCP
+
+Conectan Claude Code con sistemas de fuera: issues, bases de datos, documentos,
+APIs internas. No se enganchan con junction — la configuración vive en un
+`.mcp.json` del proyecto o en `~/.claude.json`, así que [mcp/](mcp/) guarda
+plantillas que copias.
+
+Hay una [plantilla con los cuatro transportes](mcp/mcp.json.ejemplo) y, en
+[mcp/README.md](mcp/README.md), los tres alcances y la trampa de los secretos:
+las variables con `TOKEN`, `KEY`, `SECRET`, `PASSWORD` o `AUTH` en el nombre
+**no se expanden** en `url` ni `headers` de servidores remotos, a propósito.
 
 ## Las reglas
 

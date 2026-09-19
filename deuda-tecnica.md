@@ -22,6 +22,16 @@ es trabajo que un agente puede hacer solo.
       pero no describe como escribe el agente en ella; hace falta comprobar en
       dos sesiones distintas si de verdad recuerda algo. Si no funciona, el
       unico efecto es que no recuerda nada. - `agents/auditor-deuda.md:7`
+- [ ] [M] `guard-git-destructivo.ps1` nunca se ha registrado en un
+      `settings.json` real. Sus 20 pruebas le meten el JSON a mano por stdin,
+      que es fiel al esquema documentado, pero falta verlo bloquear de verdad
+      una llamada de Claude Code. Registrarlo es decision del
+      usuario. - `hooks/guard-git-destructivo.ps1`
+- [ ] [A] La plantilla de `mcp/` no se ha probado contra ningun servidor real.
+      Las cuatro formas de transporte salen de la doc oficial y el JSON parsea,
+      pero nadie ha levantado un servidor con ella. En particular no se ha
+      comprobado en la practica el filtro anti-fuga de variables con `KEY` o
+      `TOKEN` en el nombre. - `mcp/mcp.json.ejemplo`
 - [ ] [A] Confirmar que `allowed-tools: Bash(git *) ...` pre-aprueba de verdad.
       La doc de slash commands usa esa forma con espacio; la de permisos en
       `settings.json` usa `Bash(git:*)` con dos puntos. Si la forma es
@@ -102,7 +112,24 @@ De paso, la leccion del curso que describe `/agents` con asistente de creacion
 va por detras: desde la v2.1.198 ese asistente no existe, y aqui corre la
 2.1.201.
 
-Nuevos pendientes: 4 | Cerrados: 3
+Cierre de la vuelta: el toolkit pasa a cubrir las cinco piezas de Claude Code.
+`hooks/` estrena `guard-git-destructivo.ps1`, que bloquea `push --force`,
+`reset --hard`, `clean -f` y `branch -D` por `PreToolUse` con exit 2. Es el
+ejemplo de la tesis de la leccion: la regla ya existia en el prompt de
+`/finalizar` y se cumplia casi siempre; el hook la vuelve determinista. Sus
+pruebas encontraron un bug real antes de commitear: `-match` en PowerShell
+ignora mayusculas, asi que la primera version tambien bloqueaba `git branch -d`,
+que es la variante segura. Corregido con `-cmatch`.
+
+`mcp/` entra como quinta carpeta, con plantilla de los cuatro transportes. No se
+engancha con junction: la config de MCP vive en `.mcp.json` del proyecto o en
+`~/.claude.json`, asi que se copia, como `rules/`.
+
+Y las cuatro carpetas enganchables ganan un README con que merece guardarse en
+cada una y que no, con la misma tabla skill/agente/hook repetida a proposito en
+las tres, que es la decision que mas se equivoca.
+
+Nuevos pendientes: 7 | Cerrados: 3
 
 ### 2026-09-18 - rama `claude/webhook-finalizar-setup-yiu5os`
 

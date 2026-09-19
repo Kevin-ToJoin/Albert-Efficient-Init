@@ -1,0 +1,45 @@
+{
+  "_comentario": [
+    "Plantilla de .mcp.json. Copia a la raiz del proyecto como .mcp.json y deja",
+    "solo los servidores que uses. JSON no admite comentarios, asi que esta",
+    "clave y las _nota de abajo hay que borrarlas: son para leer, no para usar.",
+    "Los cuatro ejemplos salen de la doc oficial de MCP; verifica el servidor",
+    "concreto antes de habilitarlo, porque corre con tus credenciales."
+  ],
+
+  "mcpServers": {
+    "airtable": {
+      "_nota": "stdio: el servidor es un proceso local que Claude Code arranca.",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "airtable-mcp-server"],
+      "env": {
+        "AIRTABLE_API_KEY": "${AIRTABLE_API_KEY}"
+      }
+    },
+
+    "notion": {
+      "_nota": "http: servidor remoto. Ojo, una variable con KEY/TOKEN/SECRET/PASSWORD/AUTH en el nombre NO se expande aqui, por el anti-fuga.",
+      "type": "http",
+      "url": "https://mcp.notion.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${NOTION_BEARER}"
+      }
+    },
+
+    "asana": {
+      "_nota": "sse: remoto con server-sent events.",
+      "type": "sse",
+      "url": "https://mcp.asana.com/sse",
+      "headers": {
+        "X-Api-Id": "${ASANA_ID}"
+      }
+    },
+
+    "api-interna": {
+      "_nota": "Con valor por defecto: ${VAR:-default} cae al default si VAR no esta.",
+      "type": "http",
+      "url": "${API_BASE_URL:-https://api.example.com}/mcp"
+    }
+  }
+}
