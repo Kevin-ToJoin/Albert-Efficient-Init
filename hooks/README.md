@@ -51,24 +51,24 @@ Si algo tiene que pasar sin excepciones, no lo pidas en un prompt: ponlo aqui.
 
 | Hook | Evento | Que hace |
 |---|---|---|
-| [`guard-git-destructivo.ps1`](guard-git-destructivo.ps1) | `PreToolUse` / `Bash` | Bloquea `push --force`, `reset --hard`, `clean -f` y `branch -D`. Deja pasar `--force-with-lease`, `clean -n` y `branch -d`. |
-| [`guard-secretos.ps1`](guard-secretos.ps1) | `PreToolUse` / `Bash` | Impide stagear o commitear `.env`, `*.pem`, `id_rsa`, `credentials.json`, y bloquea comandos con un token literal dentro. Deja pasar `.env.example`. |
+| [`guard-git-destructivo.js`](guard-git-destructivo.js) | `PreToolUse` / `Bash` | Bloquea `push --force`, `reset --hard`, `clean -f` y `branch -D`. Deja pasar `--force-with-lease`, `clean -n` y `branch -d`. |
+| [`guard-secretos.js`](guard-secretos.js) | `PreToolUse` / `Bash` | Impide stagear o commitear `.env`, `*.pem`, `id_rsa`, `credentials.json`, y bloquea comandos con un token literal dentro. Deja pasar `.env.example`. |
 
-Los dos fallan abierto: si el JSON no parsea, dejan pasar. Y los dos tienen
-pruebas donde la mitad de los casos comprueban lo que **no** deben bloquear,
-que es donde estan los errores caros.
+Los dos fallan abierto: si el JSON no parsea, dejan pasar. Y los dos comparten
+pruebas, donde buena parte de los casos comprueban lo que **no** deben
+bloquear, que es donde estan los errores caros:
 
-### `guard-git-destructivo.ps1`
+```bash
+node hooks/guards.test.js
+```
+
+### `guard-git-destructivo.js`
 
 Es el ejemplo de por que existen los hooks: `/finalizar` ya tiene escrito en su
 prompt que nunca haga force push, y casi siempre lo cumple. El hook lo vuelve
 imposible.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File hooks\guard-git-destructivo.test.ps1
-```
-
-### `guard-secretos.ps1`
+### `guard-secretos.js`
 
 Mira los `git add` y `git commit` y bloquea dos cosas: archivos de credenciales
 y secretos escritos en el propio comando. Revisa tambien lo que ya esta en el
@@ -81,10 +81,6 @@ Es la version determinista del perfil de seguridad de `rules/`. La regla se
 cumple casi siempre; el hook hace que un secreto no pueda llegar al historial,
 que es lo unico que importa: una vez commiteado hay que rotarlo aunque lo
 borres.
-
-```powershell
-powershell -ExecutionPolicy Bypass -File hooks\guard-secretos.test.ps1
-```
 
 ### Activarlos
 
@@ -100,17 +96,29 @@ mismo matcher, asi que van en la misma entrada:
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -NoProfile -File C:/ruta/al/repo/hooks/guard-git-destructivo.ps1"
+            "command": "node",
+            "args": ["/ruta/al/repo/hooks/guard-git-destructivo.js"]
           },
           {
             "type": "command",
-            "command": "powershell -NoProfile -File C:/ruta/al/repo/hooks/guard-secretos.ps1"
+            "command": "node",
+            "args": ["/ruta/al/repo/hooks/guard-secretos.js"]
           }
         ]
       }
     ]
   }
 }
+```
+
+Es la **forma exec**: `command` es el ejecutable y `args` sus argumentos. Al no
+pasar por ningun shell, la misma entrada vale igual en Windows, macOS y Linux,
+y no hay que preocuparse de comillas ni de espacios en la ruta.
+
+Si tu version de Claude Code no soporta `args`, la forma shell equivale:
+
+```json
+{ "type": "command", "command": "node \"/ruta/al/repo/hooks/guard-secretos.js\"" }
 ```
 
 Para desactivarlos, quita el bloque. No hay otro interruptor.
@@ -130,8 +138,29 @@ viven tambien tus `permissions`.
 
 - **`matcher`** filtra por herramienta. Los eventos que no son de herramienta lo
   ignoran.
-- **En Windows** el `.ps1` no se ejecuta solo: invocalo con
-  `powershell -NoProfile -File <ruta>`.
+
+## Por que estan en Node y no en bash o PowerShell
+
+Un hook no lo ejecuta Claude Code: Claude Code decide cuando, y lanza un
+**proceso del sistema operativo** con lo que pongas en `command`. Por eso el
+lenguaje importa, y por eso un `.ps1` no protege nada en un Mac: ahi no hay
+`powershell.exe` que arrancar.
+
+Como este toolkit se usa desde varias maquinas y desde sesiones remotas, los
+guards estan en Node:
+
+- **Una sola implementacion** para Windows, macOS y Linux. Mantener un `.sh` y
+  un `.ps1` en paralelo es la misma carga de paridad que hizo insoportable el
+  instalador viejo.
+- **`JSON.parse` de verdad.** Sacar un campo de un JSON con `sed` o `grep` es
+  fragil, y en un guard de seguridad lo fragil falla abierto sin avisar.
+- **Sin dependencias.** Solo libreria estandar: nada de `jq`, que no viene
+  instalado casi en ningun sitio.
+- La doc oficial recomienda justo este patron, `node` + script en forma exec,
+  para hooks que tienen que funcionar en varios sistemas.
+
+Lo unico que hace falta en la maquina es Node. Si escribes un hook nuevo,
+mantenlo asi salvo que solo lo vayas a usar en un sitio.
 
 ## Eventos utiles
 
@@ -175,7 +204,7 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "${CLAUDE_SKILL_DIR}/check.ps1"
+          command: "node ${CLAUDE_SKILL_DIR}/check.js"
 ---
 ```
 
@@ -184,8 +213,11 @@ Usa `once: true` si solo debe correr la primera vez que coincida.
 
 ## Antes de commitear un hook
 
-- [ ] Probado con el JSON real por stdin, no solo leido.
+- [ ] Probado con el JSON real por stdin, no solo leido. Agrega sus casos a
+      `guards.test.js` y corre `node hooks/guards.test.js`.
 - [ ] Falla abierto ante entrada que no entiende.
 - [ ] El `matcher` esta acotado a las herramientas que aplican.
 - [ ] Si bloquea, el mensaje dice **por que** y **que hacer en su lugar**.
+- [ ] Sin nada especifico de un sistema operativo: rutas con `path.join`, nada
+      de `C:\`, nada de comandos que solo existan en uno.
 - [ ] Documentado en el catalogo de arriba, con su bloque JSON.

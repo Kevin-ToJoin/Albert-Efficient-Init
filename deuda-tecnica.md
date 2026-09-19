@@ -27,6 +27,16 @@ es trabajo que un agente puede hacer solo.
       mano por stdin, fiel al esquema documentado, pero falta verlos bloquear
       de verdad una llamada de Claude Code. Registrarlos es decision del
       usuario. - `hooks/`
+- [ ] [M] Los guards se portaron a Node para que corran en los tres sistemas,
+      pero **solo se han ejecutado en Windows**. No usan nada especifico de
+      plataforma y las rutas van por `path.join`, asi que deberian correr igual
+      en macOS y Linux, pero eso es inspeccion, no prueba. Correr
+      `node hooks/guards.test.js` en un Mac o en una sesion remota lo
+      cierra. - `hooks/guards.test.js`
+- [ ] [A] La forma `exec` del registro (`command` + `args`) sale de la doc, que
+      no dice desde que version existe. Aqui corre la 2.1.201 y no se ha
+      probado. El README documenta la forma shell como alternativa por si
+      acaso. - `hooks/README.md`
 - [ ] [A] `auditor-seguridad` nunca se ha ejecutado contra un proyecto real.
       Los nueve puntos y el formato de reporte estan escritos, pero no se sabe
       si distingue bien "no esta" de "no lo veo", que es lo unico que lo hace
@@ -122,7 +132,29 @@ comando: `git commit` con el `.env` ya en el index. Esa prueba fallo al
 principio por un error del propio test, no del hook: `git restore --staged`
 necesita un `HEAD` y el repo recien inicializado no tiene ninguno.
 
-Nuevos pendientes: 4 | Cerrados: 0
+Despues, un cambio de requisito obligo a rehacer los dos guards: el toolkit se
+usa desde varias maquinas, tambien macOS y Linux y sesiones remotas, y un
+`.ps1` no protege nada fuera de Windows. Portados a Node, sin dependencias, una
+sola implementacion. Se borraron los cuatro `.ps1` y las pruebas se unificaron
+en `guards.test.js`, mismos 47 casos.
+
+La duda que lo destapo fue buena: "los hooks se corren en Claude Code, no?".
+Claude Code decide *cuando*, pero el comando lo ejecuta el sistema operativo,
+que es justo por lo que el lenguaje importa. La propia leccion lo deja ver
+cuando habla de correr `gofmt` o Prettier: son binarios de tu maquina.
+
+Se eligio Node y no bash por tres razones: `JSON.parse` de verdad en vez de
+regex sobre JSON, que en un guard de seguridad importa; `jq` no esta instalado
+en esta maquina y casi en ninguna; y la doc oficial recomienda exactamente el
+patron `node` + script en forma exec para hooks multiplataforma. El registro
+pasa a forma exec (`command` + `args`), que al no pasar por ningun shell evita
+la pregunta de Git Bash contra PowerShell en Windows.
+
+De paso quedo documentado en `hooks/README.md` por que los hooks son la unica
+parte del repo que depende del sistema: las skills, los agents y las rules son
+datos que interpreta Claude Code, y los hooks son procesos que lanza el SO.
+
+Nuevos pendientes: 6 | Cerrados: 0
 
 ### 2026-09-18 - rama `main` (refactor a carpeta pura)
 
