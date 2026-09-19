@@ -47,6 +47,8 @@ gastar contexto en reglas que no aplican:
 
 - `rules-coding.md` — desarrollo, code review, debugging, refactors.
 - `rules-analysis.md` — análisis de datos, research, reporting.
+- `rules-seguridad.md` — autenticación, datos de usuarios, endpoints públicos,
+  pagos, secretos.
 
 También puedes pedirlo explícitamente en un prompt: *"aplica el perfil de coding
 y revisa esta función"*.

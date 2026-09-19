@@ -22,6 +22,7 @@ ln -s "<ruta-al-repo>/skills" ~/.claude/skills
 | Comando | Para que |
 |---|---|
 | [`/finalizar`](finalizar/SKILL.md) | Cierra la sesion de trabajo: registra la deuda en `deuda-tecnica.md`, commitea, mergea a la rama base, y reporta solo lo que requiere tu accion manual. |
+| [`/lanzar-dominio`](lanzar-dominio/SKILL.md) | Puesta en marcha de un dominio: reparto en subdominios, `robots.txt`, sitemap y alta en Search Console. Genera lo que puede y marca lo que es manual tuyo. |
 
 ## Que guardar aqui
 

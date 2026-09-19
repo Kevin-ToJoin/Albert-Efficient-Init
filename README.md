@@ -77,6 +77,14 @@ que ya quedó escrito en `deuda-tecnica.md` (refactors, tests, TODOs).
 Nunca hace `push --force`, y ante un conflicto aborta el merge, te devuelve a tu
 rama y te lo dice en lugar de resolverlo por su cuenta.
 
+### `/lanzar-dominio`
+
+Checklist de puesta en marcha de un dominio. Propone el reparto en subdominios
+— sitio, app, correo transaccional y campañas separados, para que una campaña
+marcada como spam no se lleve por delante tus correos de recuperar contraseña —
+genera `robots.txt` y sitemap si hacen falta, y marca como pendiente tuyo lo que
+no puede hacer: DNS, registrador y Search Console.
+
 ## Los subagentes
 
 Corren en **su propia ventana de contexto** y te devuelven solo el resultado,
@@ -91,6 +99,17 @@ registrado**. Complementa a `/finalizar`, que solo conoce la sesión actual.
 
 Si no encuentra nada responde `Todo registrado.` y ya. No escribe en ningún
 archivo: reporta, y quien registra es `/finalizar`.
+
+### `@agent-auditor-seguridad`
+
+Audita una app contra nueve puntos básicos: secretos fuera del repo, ninguna
+tabla de base de datos pública, row-level security, auth en rutas protegidas,
+tokens validados en el servidor, rate limiting, errores que no filtran stack
+traces, endpoints de debug bloqueados y sistema de logging.
+
+Separa lo que falta de lo que **no se puede verificar desde el código** — que
+el repo no muestre las policies de la base no prueba que no existan. Esa
+distinción es la diferencia entre un reporte útil y uno que asusta sin motivo.
 
 El formato, el frontmatter completo y las trampas están en
 [agents/README.md](agents/README.md).
@@ -110,8 +129,17 @@ Es el ejemplo de por qué existen los hooks: `/finalizar` ya lleva escrito en su
 prompt que nunca haga force push, y casi siempre lo cumple. El hook lo vuelve
 imposible.
 
-Falla abierto — si no entiende su entrada, deja pasar. Tiene 20 pruebas, la
-mitad dedicadas a comprobar lo que **no** debe bloquear.
+### `guard-secretos.ps1`
+
+Impide que un secreto llegue a un commit: bloquea stagear `.env`, `*.pem`,
+`id_rsa` o `credentials.json`, y bloquea comandos que lleven un token escrito
+dentro. Mira también lo que ya está en el index, que es como se filtra un `.env`
+de verdad — con un `git add .` y a correr. Las plantillas tipo `.env.example`
+pasan, porque están hechas para commitearse.
+
+Los dos fallan abierto: si no entienden su entrada, dejan pasar. Entre ambos
+suman 47 pruebas, buena parte dedicadas a comprobar lo que **no** deben
+bloquear — un guard que molesta acaba desactivado, y entonces no protege nada.
 
 A diferencia de los comandos, **no basta con dejar el archivo en la carpeta**:
 hay que registrarlo en un `settings.json`. El bloque para pegar y la guía de

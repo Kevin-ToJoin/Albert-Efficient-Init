@@ -112,16 +112,18 @@ que deberia ser un agente o un hook.
 
 ## Como se verifica lo que hay aqui
 
-Hay un solo test, y es el del hook, porque un `PreToolUse` mal escrito bloquea
-todas las herramientas:
+Los unicos tests son los de los hooks, porque un `PreToolUse` mal escrito
+bloquea todas las herramientas:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File hooks\guard-git-destructivo.test.ps1
+powershell -ExecutionPolicy Bypass -File hooks\guard-secretos.test.ps1
 ```
 
-Correlo siempre que toques el guard. La mitad de sus casos comprueban lo que
+Correlos siempre que toques un guard. Buena parte de sus casos comprueban lo que
 **no** debe bloquear, que es donde estan los errores caros: la primera version
-bloqueaba `git branch -d` porque el `-match` de PowerShell ignora mayusculas.
+del guard de git bloqueaba `git branch -d` porque el `-match` de PowerShell
+ignora mayusculas, y el de secretos tiene que dejar pasar los `.env.example`.
 
 Lo demas se verifica a mano. Los bloques ` ```! ` de una skill se ejecutan
 **antes** de que Claude la vea, y **si salen != 0 abortan la invocacion

@@ -69,6 +69,8 @@ Lee el perfil que corresponda solo si la tarea lo pide, no por defecto:
 - `Efficiency/rules-coding.md` para desarrollo, code review, debugging y
   refactors.
 - `Efficiency/rules-analysis.md` para analisis de datos, research y reporting.
+- `Efficiency/rules-seguridad.md` cuando el trabajo toque autenticacion, datos
+  de usuarios, endpoints publicos, pagos o secretos.
 
 Si la tarea es mixta o no esta clara, pregunta que perfil usar en vez de
 adivinar.
