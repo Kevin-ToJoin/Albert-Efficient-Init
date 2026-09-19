@@ -39,9 +39,10 @@ archivo, asi que no gasta contexto. Las notas para humanos van aqui.
 
 # Albert-Efficient-Init
 
-Toolkit personal de comandos, hooks y reglas para Claude Code. El repo es
-**contenido puro**: no hay instalador, ni build, ni suite de tests. Todo lo que
-hay son archivos Markdown que Claude Code carga desde otro sitio.
+Toolkit personal de comandos, subagentes, hooks y reglas para Claude Code. El
+repo es **contenido puro**: no hay instalador ni build. Casi todo son archivos
+Markdown que Claude Code carga desde otro sitio; la unica excepcion son los
+scripts de `hooks/`, que si son codigo y si tienen pruebas.
 
 La documentacion de este repo esta en espanol. Mantenla asi.
 
@@ -70,7 +71,7 @@ marcado legacy frente a `skills/<n>/SKILL.md`; `$HOME` es de solo lectura en
 PowerShell 5.1; y los hooks no pueden ser file-drop, siempre necesitan una
 entrada en `settings.json`.
 
-## Cuatro carpetas, tres mecanicas distintas
+## Cinco carpetas, tres mecanicas distintas
 
 Es lo que mas se presta a error. Cada una llega a Claude Code por una via
 diferente:
@@ -80,7 +81,12 @@ diferente:
 | `skills/` | Junction: `~/.claude/skills` apunta aqui | Editar un `SKILL.md` cambia el comando **en vivo y en todos los repos** del usuario |
 | `agents/` | Junction: `~/.claude/agents` apunta aqui | Igual que las skills. Los archivos sin `name` en el frontmatter se ignoran como documentacion |
 | `hooks/` | No llega sola | Necesita una entrada en `settings.json`. No existe carpeta auto-cargable |
+| `mcp/` | No llega sola | Se copia a `.mcp.json` del proyecto, o se registra con `claude mcp add` |
 | `rules/` | No llega sola | Se copia a mano al proyecto que la quiera |
+
+Cada una tiene su `README.md` con que merece guardarse ahi y que no. Si vas a
+crear algo nuevo, leelo antes: la confusion tipica es meter en `skills/` algo
+que deberia ser un agente o un hook.
 
 ## Lo que no es obvio
 
@@ -104,11 +110,22 @@ diferente:
   `omitClaudeMd: true`. Este archivo entra en su contexto tambien, asi que
   mantenerlo corto importa mas de lo que parece.
 
-## La unica verificacion que existe
+## Como se verifica lo que hay aqui
 
-No hay tests, pero los bloques ` ```! ` de una skill se ejecutan **antes** de
-que Claude la vea, y **si salen != 0 abortan la invocacion entera**. Termina
-siempre en `true` y protege cada linea con `||`.
+Hay un solo test, y es el del hook, porque un `PreToolUse` mal escrito bloquea
+todas las herramientas:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File hooks\guard-git-destructivo.test.ps1
+```
+
+Correlo siempre que toques el guard. La mitad de sus casos comprueban lo que
+**no** debe bloquear, que es donde estan los errores caros: la primera version
+bloqueaba `git branch -d` porque el `-match` de PowerShell ignora mayusculas.
+
+Lo demas se verifica a mano. Los bloques ` ```! ` de una skill se ejecutan
+**antes** de que Claude la vea, y **si salen != 0 abortan la invocacion
+entera**. Termina siempre en `true` y protege cada linea con `||`.
 
 Antes de commitear un comando, extrae el bloque y correlo:
 
