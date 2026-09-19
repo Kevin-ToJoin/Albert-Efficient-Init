@@ -52,20 +52,44 @@ Si algo tiene que pasar sin excepciones, no lo pidas en un prompt: ponlo aqui.
 | Hook | Evento | Que hace |
 |---|---|---|
 | [`guard-git-destructivo.ps1`](guard-git-destructivo.ps1) | `PreToolUse` / `Bash` | Bloquea `push --force`, `reset --hard`, `clean -f` y `branch -D`. Deja pasar `--force-with-lease`, `clean -n` y `branch -d`. |
+| [`guard-secretos.ps1`](guard-secretos.ps1) | `PreToolUse` / `Bash` | Impide stagear o commitear `.env`, `*.pem`, `id_rsa`, `credentials.json`, y bloquea comandos con un token literal dentro. Deja pasar `.env.example`. |
+
+Los dos fallan abierto: si el JSON no parsea, dejan pasar. Y los dos tienen
+pruebas donde la mitad de los casos comprueban lo que **no** deben bloquear,
+que es donde estan los errores caros.
+
+### `guard-git-destructivo.ps1`
 
 Es el ejemplo de por que existen los hooks: `/finalizar` ya tiene escrito en su
 prompt que nunca haga force push, y casi siempre lo cumple. El hook lo vuelve
 imposible.
 
-Falla abierto: si el JSON no parsea, deja pasar. Tiene pruebas en
-[`guard-git-destructivo.test.ps1`](guard-git-destructivo.test.ps1), la mitad de
-ellas dedicadas a comprobar lo que **no** debe bloquear:
-
 ```powershell
 powershell -ExecutionPolicy Bypass -File hooks\guard-git-destructivo.test.ps1
 ```
 
-Para activarlo, pega esto en tu `settings.json` con la ruta real del repo:
+### `guard-secretos.ps1`
+
+Mira los `git add` y `git commit` y bloquea dos cosas: archivos de credenciales
+y secretos escritos en el propio comando. Revisa tambien lo que ya esta en el
+index, que es como se filtra un `.env` de verdad: con un `git add .` y a correr.
+
+Las plantillas pasan a proposito. Un `.env.example` esta hecho para commitearse,
+y un guard que lo bloquea acaba desactivado.
+
+Es la version determinista del perfil de seguridad de `rules/`. La regla se
+cumple casi siempre; el hook hace que un secreto no pueda llegar al historial,
+que es lo unico que importa: una vez commiteado hay que rotarlo aunque lo
+borres.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File hooks\guard-secretos.test.ps1
+```
+
+### Activarlos
+
+Pega esto en tu `settings.json` con la ruta real del repo. Los dos comparten el
+mismo matcher, asi que van en la misma entrada:
 
 ```json
 {
@@ -77,6 +101,10 @@ Para activarlo, pega esto en tu `settings.json` con la ruta real del repo:
           {
             "type": "command",
             "command": "powershell -NoProfile -File C:/ruta/al/repo/hooks/guard-git-destructivo.ps1"
+          },
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -File C:/ruta/al/repo/hooks/guard-secretos.ps1"
           }
         ]
       }
@@ -85,7 +113,7 @@ Para activarlo, pega esto en tu `settings.json` con la ruta real del repo:
 }
 ```
 
-Para desactivarlo, quita ese bloque. No hay otro interruptor.
+Para desactivarlos, quita el bloque. No hay otro interruptor.
 
 ## Donde registrarlo
 

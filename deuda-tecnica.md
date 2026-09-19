@@ -22,11 +22,25 @@ es trabajo que un agente puede hacer solo.
       pero no describe como escribe el agente en ella; hace falta comprobar en
       dos sesiones distintas si de verdad recuerda algo. Si no funciona, el
       unico efecto es que no recuerda nada. - `agents/auditor-deuda.md:7`
-- [ ] [M] `guard-git-destructivo.ps1` nunca se ha registrado en un
-      `settings.json` real. Sus 20 pruebas le meten el JSON a mano por stdin,
-      que es fiel al esquema documentado, pero falta verlo bloquear de verdad
-      una llamada de Claude Code. Registrarlo es decision del
-      usuario. - `hooks/guard-git-destructivo.ps1`
+- [ ] [M] Ningun hook se ha registrado en un `settings.json` real. Las 47
+      pruebas de `guard-git-destructivo` y `guard-secretos` les meten el JSON a
+      mano por stdin, fiel al esquema documentado, pero falta verlos bloquear
+      de verdad una llamada de Claude Code. Registrarlos es decision del
+      usuario. - `hooks/`
+- [ ] [A] `auditor-seguridad` nunca se ha ejecutado contra un proyecto real.
+      Los nueve puntos y el formato de reporte estan escritos, pero no se sabe
+      si distingue bien "no esta" de "no lo veo", que es lo unico que lo hace
+      util. Probarlo contra una app con base de datos, no contra este
+      repo. - `agents/auditor-seguridad.md`
+- [ ] [A] `/lanzar-dominio` no se ha invocado como slash command. Su bloque `!`
+      si esta probado en cuatro estados de proyecto (vacio, con `package.json`,
+      con carpeta publica, y este repo) y sale `EXIT=0` en los
+      cuatro. - `skills/lanzar-dominio/SKILL.md`
+- [ ] [A] La lista de nueve puntos de `auditor-seguridad` se reconstruyo desde
+      capturas donde solo se veian numerados el 6 al 10; los otros cuatro salen
+      de slides sueltas. El contenido es estandar y se sostiene solo, pero la
+      numeracion puede no coincidir con la lista
+      original. - `agents/auditor-seguridad.md`
 - [ ] [A] La plantilla de `mcp/` no se ha probado contra ningun servidor real.
       Las cuatro formas de transporte salen de la doc oficial y el JSON parsea,
       pero nadie ha levantado un servidor con ella. En particular no se ha
@@ -82,6 +96,33 @@ es trabajo que un agente puede hacer solo.
       Convertidos a bloques `if`.
 
 ## Bitacora
+
+### 2026-09-18 - rama `seguridad-y-dominio`
+
+Entra un lote de buenas practicas de seguridad y de puesta en marcha de
+dominio, repartido segun las guias que estrenaron las carpetas la vuelta
+anterior. Sirvio de primera prueba real de que esas guias deciden bien:
+
+- Lo que no puede fallar nunca fue a `hooks/`: `guard-secretos.ps1` impide que
+  un `.env`, un `.pem` o un token literal lleguen a un commit, y mira tambien
+  el index, que es por donde se filtran de verdad. Deja pasar `.env.example`.
+- El checklist de nueve puntos fue a `agents/`: barrer un repo entero y
+  devolver un reporte corto es exactamente la forma de un subagente.
+- Los principios de fondo fueron a `rules/Efficiency/rules-seguridad.md`, el
+  tercer perfil, que se carga solo cuando la tarea toca auth, datos o secretos.
+- El procedimiento de dominio fue a `skills/`, porque tiene pasos y criterio y
+  lo disparas tu.
+- **A `mcp/` no fue nada**, y es la decision que mas costo: ninguno de estos
+  tips necesita un sistema externo, y meter uno ahi habria roto la regla del
+  propio `mcp/README.md` sobre no agregar lo que "podria servir".
+
+El guard de secretos tiene 27 pruebas, incluida una que monta un repo git de
+verdad en Temp para cubrir el caso que no se puede simular con el texto del
+comando: `git commit` con el `.env` ya en el index. Esa prueba fallo al
+principio por un error del propio test, no del hook: `git restore --staged`
+necesita un `HEAD` y el repo recien inicializado no tiene ninguno.
+
+Nuevos pendientes: 4 | Cerrados: 0
 
 ### 2026-09-18 - rama `main` (refactor a carpeta pura)
 

@@ -73,6 +73,11 @@ decidir si algo merece ser un agente.
 | Agente | Para que |
 |---|---|
 | [`auditor-deuda`](auditor-deuda.md) | Barre el repo y reporta la deuda tecnica que **no** esta en `deuda-tecnica.md`. Complementa a `/finalizar`, que solo mira la sesion actual. |
+| [`auditor-seguridad`](auditor-seguridad.md) | Audita la app contra nueve puntos basicos: secretos, permisos de base de datos, RLS, auth en rutas, validacion de tokens, rate limiting, stack traces filtrados, endpoints de debug y logging. |
+
+> `auditor-seguridad` no solapa con el `/security-review` que trae Claude Code:
+> ese revisa **el diff** de la rama, y este revisa **la app entera** contra una
+> lista fija. Uno mira lo que acabas de cambiar, el otro lo que nunca pusiste.
 
 ## Como se invoca
 
