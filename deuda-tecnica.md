@@ -22,21 +22,19 @@ es trabajo que un agente puede hacer solo.
       pero no describe como escribe el agente en ella; hace falta comprobar en
       dos sesiones distintas si de verdad recuerda algo. Si no funciona, el
       unico efecto es que no recuerda nada. - `agents/auditor-deuda.md:7`
-- [ ] [M] Ningun hook se ha registrado en un `settings.json` real. Las 47
-      pruebas de `guard-git-destructivo` y `guard-secretos` les meten el JSON a
-      mano por stdin, fiel al esquema documentado, pero falta verlos bloquear
-      de verdad una llamada de Claude Code. Registrarlos es decision del
-      usuario. - `hooks/`
 - [ ] [M] Los guards se portaron a Node para que corran en los tres sistemas,
       pero **solo se han ejecutado en Windows**. No usan nada especifico de
       plataforma y las rutas van por `path.join`, asi que deberian correr igual
-      en macOS y Linux, pero eso es inspeccion, no prueba. Correr
-      `node hooks/guards.test.js` en un Mac o en una sesion remota lo
-      cierra. - `hooks/guards.test.js`
-- [ ] [A] La forma `exec` del registro (`command` + `args`) sale de la doc, que
-      no dice desde que version existe. Aqui corre la 2.1.201 y no se ha
-      probado. El README documenta la forma shell como alternativa por si
-      acaso. - `hooks/README.md`
+      en macOS y Linux, pero eso es inspeccion, no prueba. En esta maquina hay
+      WSL con Ubuntu y kali y esta instalado Docker, pero ninguna de las tres
+      tiene Node y el demonio de Docker no arranca, asi que no se pudo cerrar
+      aqui. Correr `node hooks/guards.test.js` en un Mac, en una sesion remota,
+      o en un contenedor `node:22` lo cierra. - `hooks/guards.test.js`
+- [ ] [A] La forma `exec` del registro (`command` + `args`) sigue sin probarse.
+      La doc la recomienda pero no dice desde que version existe `args`, asi que
+      el registro real se hizo con la forma shell, que si esta verificada en la
+      2.1.201. Si algun dia se confirma `exec`, es marginalmente mas robusto con
+      rutas raras. - `hooks/README.md`
 - [ ] [A] `auditor-seguridad` nunca se ha ejecutado contra un proyecto real.
       Los nueve puntos y el formato de reporte estan escritos, pero no se sabe
       si distingue bien "no esta" de "no lo veo", que es lo unico que lo hace
@@ -77,6 +75,27 @@ es trabajo que un agente puede hacer solo.
 
 ## Cerrados
 
+- [x] 2026-09-19 - Falso positivo de `guard-secretos`, encontrado en su primer
+      uso real y costo dos intentos. Bloqueo un `git commit` cuyo **mensaje**
+      mencionaba `git add .env`: hablar de un archivo no es commitearlo. El
+      primer arreglo aparto el texto entrecomillado antes de trocear, y fallo
+      igual, porque el mensaje llevaba comillas dobles dentro y el
+      emparejamiento se desalineaba. La leccion es que parsear sintaxis de
+      shell con expresiones regulares no se sostiene. El arreglo bueno es no
+      intentarlo: el escaneo de rutas corre solo en `git add` y
+      `git stash push`, cuyos argumentos **son** rutas, y en `git commit` manda
+      el index, que es la verdad de git y no una suposicion sobre el texto.
+      Siete casos de regresion, heredoc y comillas anidadas
+      incluidos. - `hooks/guard-secretos.js`
+- [x] 2026-09-19 - Los dos guards verificados de punta a punta en una sesion
+      real de Claude Code, no solo con JSON simulado por stdin. Registrados en
+      `~/.claude/settings.json` global con forma shell, `git branch -D` y
+      `git add .env` quedaron bloqueados con su mensaje, y `git status` y la
+      variante segura `git branch -d` pasaron sin tocarse. El cambio de
+      `settings.json` surtio efecto **sin reiniciar** la sesion.
+- [x] 2026-09-19 - Enganchadas las junctions de `~/.claude/skills` y
+      `~/.claude/agents` al repo. Las cuatro skills y agentes resuelven a traves
+      del enlace.
 - [x] 2026-09-18 - Tres pendientes desaparecen con el refactor a carpeta pura,
       no por haberse resuelto: el `tests/install_test.sh` que faltaba, el HEAD
       desprendido que dejaba `bootstrap.sh`, y el campo `version` duplicado
