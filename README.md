@@ -119,7 +119,7 @@ El formato, el frontmatter completo y las trampas están en
 Lo que los distingue de todo lo demás: **son deterministas**. Una regla del
 `CLAUDE.md` se cumple casi siempre; un hook se cumple siempre.
 
-### `guard-git-destructivo.ps1`
+### `guard-git-destructivo.js`
 
 Bloquea `git push --force`, `reset --hard`, `clean -f` y `branch -D` antes de
 que se ejecuten, y le explica a Claude por qué y qué hacer en su lugar. Deja
@@ -129,7 +129,7 @@ Es el ejemplo de por qué existen los hooks: `/finalizar` ya lleva escrito en su
 prompt que nunca haga force push, y casi siempre lo cumple. El hook lo vuelve
 imposible.
 
-### `guard-secretos.ps1`
+### `guard-secretos.js`
 
 Impide que un secreto llegue a un commit: bloquea stagear `.env`, `*.pem`,
 `id_rsa` o `credentials.json`, y bloquea comandos que lleven un token escrito
@@ -137,9 +137,15 @@ dentro. Mira también lo que ya está en el index, que es como se filtra un `.en
 de verdad — con un `git add .` y a correr. Las plantillas tipo `.env.example`
 pasan, porque están hechas para commitearse.
 
-Los dos fallan abierto: si no entienden su entrada, dejan pasar. Entre ambos
-suman 47 pruebas, buena parte dedicadas a comprobar lo que **no** deben
-bloquear — un guard que molesta acaba desactivado, y entonces no protege nada.
+Los dos fallan abierto: si no entienden su entrada, dejan pasar. Suman 47
+pruebas (`node hooks/guards.test.js`), buena parte dedicadas a comprobar lo que
+**no** deben bloquear — un guard que molesta acaba desactivado, y entonces no
+protege nada.
+
+Están en **Node**, no en bash ni PowerShell, porque un hook lo ejecuta el
+sistema operativo y no Claude Code: un `.ps1` no protege nada en un Mac. Una
+sola implementación corre en Windows, macOS y Linux, y en las sesiones remotas.
+Lo único que hace falta en la máquina es Node.
 
 A diferencia de los comandos, **no basta con dejar el archivo en la carpeta**:
 hay que registrarlo en un `settings.json`. El bloque para pegar y la guía de

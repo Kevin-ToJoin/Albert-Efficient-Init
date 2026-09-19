@@ -115,15 +115,14 @@ que deberia ser un agente o un hook.
 Los unicos tests son los de los hooks, porque un `PreToolUse` mal escrito
 bloquea todas las herramientas:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File hooks\guard-git-destructivo.test.ps1
-powershell -ExecutionPolicy Bypass -File hooks\guard-secretos.test.ps1
+```bash
+node hooks/guards.test.js
 ```
 
-Correlos siempre que toques un guard. Buena parte de sus casos comprueban lo que
-**no** debe bloquear, que es donde estan los errores caros: la primera version
-del guard de git bloqueaba `git branch -d` porque el `-match` de PowerShell
-ignora mayusculas, y el de secretos tiene que dejar pasar los `.env.example`.
+Correlo siempre que toques un guard. Buena parte de sus 47 casos comprueban lo
+que **no** debe bloquear, que es donde estan los errores caros: una version
+anterior bloqueaba `git branch -d`, que es la variante segura, y el de secretos
+tiene que dejar pasar los `.env.example`.
 
 Lo demas se verifica a mano. Los bloques ` ```! ` de una skill se ejecutan
 **antes** de que Claude la vea, y **si salen != 0 abortan la invocacion
@@ -142,10 +141,15 @@ dar `EXIT=0`.
 
 ## Entorno
 
-- **PowerShell 5.1 Desktop**, sin `pwsh` 7. Los scripts de `hooks/` no pueden
-  usar `&&`, `||` como encadenadores, ternarios ni `??`. `$HOME` es de solo
-  lectura: para aislarlo en una prueba, lanza un proceso hijo con
-  `$env:USERPROFILE` cambiado.
+Este toolkit se usa desde **varias maquinas** (Windows, macOS, Linux) y desde
+sesiones remotas. Nada de lo que se agregue aqui puede asumir un solo sistema.
+
+- **Los hooks van en Node**, sin dependencias. Es lo unico del repo que se
+  ejecuta, y un hook lo lanza el sistema operativo, no Claude Code: un `.ps1`
+  no protege nada fuera de Windows. Rutas con `path.join`, nunca `C:\`.
+- La maquina principal es **Windows con PowerShell 5.1 Desktop**, sin `pwsh` 7.
+  Si escribes PowerShell para algo puntual, recuerda que ahi no hay `&&` como
+  encadenador, ni ternarios, ni `??`, y que `$HOME` es de solo lectura.
 - **Sin `gh` CLI.** No hay flujo de PRs desde aqui: commit local y push.
 - Las rutas reales del usuario llevan espacios. Cita siempre.
 
