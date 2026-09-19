@@ -91,7 +91,7 @@ comprobar(SEC, 'git add id_rsa', 2);
 comprobar(SEC, 'git add certs/server.pem', 2);
 comprobar(SEC, 'git add credentials.json', 2);
 comprobar(SEC, 'git add serviceAccountKey.json', 2);
-comprobar(SEC, 'git commit -m "wip" .env.local', 2);
+comprobar(SEC, 'git stash push .env', 2);
 
 console.log('\n=== guard-secretos: plantillas SI se commitean ===');
 comprobar(SEC, 'git add .env.example', 0);
@@ -112,6 +112,19 @@ comprobar(SEC, 'npm install', 0);
 comprobar(SEC, 'git commit -m "docs: explicar ${AIRTABLE_API_KEY}"', 0, null, 'placeholder');
 comprobar(SEC, 'git log --oneline', 0);
 comprobar(SEC, 'cat .env', 0, null, 'leerlo no es commitearlo');
+
+// Falso positivo real: la primera version bloqueo un commit cuyo MENSAJE
+// hablaba de .env. Hablar de un archivo no es commitearlo. En git commit no se
+// mira el texto: manda el index.
+comprobar(SEC, 'git commit -m "explicar por que git add .env se bloquea"', 0, null, 'mensaje que menciona .env');
+comprobar(SEC, 'git commit -m "renombrar .env.local y certs/x.pem"', 0, null, 'mensaje con varias rutas');
+comprobar(SEC, "git commit -m 'arreglar la deteccion de id_rsa'", 0, null, 'comillas simples');
+// El caso que destapo el segundo fallo: comillas dobles DENTRO del mensaje
+// desalineaban el emparejamiento y .env quedaba fuera de las comillas.
+comprobar(SEC, 'git commit -m "el guard rechazo \\"git add .env\\" por error"', 0, null, 'comillas anidadas');
+comprobar(SEC, 'git commit -q -m "$(cat <<EOF\nhabla de git add .env\nEOF\n)"', 0, null, 'heredoc con .env dentro');
+comprobar(SEC, 'git add ".env"', 2, null, 'ruta entrecomillada: sigue bloqueada');
+comprobar(SEC, 'git add "config/.env.production"', 2, null, 'ruta entrecomillada con carpeta');
 
 console.log('\n=== guard-secretos: repo real con .env en el index ===');
 const sandbox = fs.mkdtempSync(path.join(os.tmpdir(), 'aei-secretos-'));

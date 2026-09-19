@@ -95,10 +95,37 @@ function esSensible(ruta) {
 
 const encontrados = new Set();
 
-// 2a. Rutas nombradas explicitamente en el comando.
-for (const token of cmd.split(/\s+/)) {
-  if (token.startsWith('-')) continue;
-  if (esSensible(token)) encontrados.add(token);
+// 2a. Rutas nombradas en el comando. Solo para los comandos cuyos argumentos
+// SON rutas.
+//
+// En `git commit` no se mira el texto, a proposito. Sus argumentos son sobre
+// todo un mensaje, y un mensaje que habla de un .env no es un .env. La primera
+// version escaneaba el comando entero y se bloqueo a si misma al commitear el
+// arreglo de este mismo guard. Intentar separar el mensaje con expresiones
+// regulares tampoco vale: en cuanto el mensaje lleva comillas dentro, el
+// emparejamiento se desalinea y vuelve el falso positivo.
+//
+// Para `git commit` manda el index (2b), que es la verdad de git y no una
+// suposicion sobre el texto.
+if (/git\s+(add|stash\s+push)\b/.test(cmd)) {
+  // Lo entrecomillado se aparta, y de ahi solo cuenta lo que es una ruta y
+  // nada mas, para que `git add ".env"` siga bloqueado.
+  const entrecomillados = [];
+  const sinComillas = cmd.replace(/"([^"]*)"|'([^']*)'/g, (m, d, s) => {
+    entrecomillados.push(d !== undefined ? d : s);
+    return ' ';
+  });
+
+  for (const token of sinComillas.split(/\s+/)) {
+    if (token.startsWith('-')) continue;
+    if (esSensible(token)) encontrados.add(token);
+  }
+
+  for (const seg of entrecomillados) {
+    const s = seg.trim();
+    if (!s || /[\s$`;|&]/.test(s)) continue;
+    if (esSensible(s)) encontrados.add(s);
+  }
 }
 
 // 2b. Lo que ya este en el index. Cubre "git add ." seguido de "git commit".
