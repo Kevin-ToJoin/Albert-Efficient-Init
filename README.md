@@ -59,7 +59,8 @@ sesión. Tu `CLAUDE.md` queda para lo propio del proyecto;
 ### Actualizaciones
 
 `"autoUpdate": true` hace que Claude Code refresque el plugin en segundo plano
-al arrancar cada sesión, y la siguiente sesión ya carga la versión nueva. El
+durante cada sesión interactiva (hasta 10 minutos después del primer mensaje),
+y la siguiente sesión ya carga la versión nueva. El
 plugin no declara `version` a propósito, así que cada commit a `main` de este
 repo es una actualización: no hay que subir ningún número de versión.
 

@@ -118,8 +118,9 @@ Nada mas.
 
 ## Actualizaciones
 
-Automaticas. Al abrir una sesion, Claude Code busca cambios en segundo plano y
-**la siguiente** sesion ya usa la version nueva. Si ves
+Automaticas. En una sesion interactiva, hasta 10 minutos despues de tu primer
+mensaje, Claude Code busca cambios en segundo plano, y **la siguiente** sesion
+ya usa la version nueva. Si ves
 `Plugin updated ... Run /reload-plugins to apply`, escribe `/reload-plugins`
 para no esperar.
 
@@ -142,4 +143,5 @@ Para forzarla: `/plugin marketplace update albert-efficient-init`.
 | El equipo no recibe nada | `.claude/` esta en el `.gitignore` | Quitalo del `.gitignore` y sube el archivo |
 | Aviso de hook con `node` al abrir la sesion o en cada comando | Node no esta instalado | Instala Node |
 | El comando de Windows falla al descargar | PowerShell sin acceso a internet o bloqueado por la red | Crea `.claude/settings.json` a mano con el contenido del [README](../README.md#integrarlo-en-un-repositorio) |
-| No llegan las actualizaciones | El auto-update no corrio | `/plugin marketplace update albert-efficient-init` |
+| No llegan las actualizaciones | El auto-update corre en sesiones interactivas, hasta 10 minutos despues del primer mensaje, y carga en la sesion siguiente | Espera a la proxima sesion, o `/plugin marketplace update albert-efficient-init` |
+| Con `claude -p` (CI, scripts) no aparece el plugin | En modo no interactivo el plugin carga en segundo plano y puede faltar en el primer turno | Define `CLAUDE_CODE_SYNC_PLUGIN_INSTALL=1` para que espere a cargarlo |

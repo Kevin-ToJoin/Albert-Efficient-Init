@@ -23,10 +23,6 @@ es trabajo que un agente puede hacer solo.
 - [ ] [M] En GitHub, Settings > Emails: activar "Keep my email addresses
       private" y "Block command line pushes that expose my email". Es lo que
       impide que el correo personal vuelva a colarse desde cualquier maquina.
-- [ ] [A] `"autoUpdate": true` no se ha visto actualizar nada: hace falta un
-      merge, abrir sesion en un repo integrado y ver `Plugin updated`. Sin
-      eso, el fallback es `/plugin marketplace update albert-efficient-init`.
-      - `instalar/settings.json`
 - [ ] [A] El campo `memory: project` de `auditor-deuda` esta puesto sin
       verificar. La referencia lo documenta como alcance de memoria persistente
       pero no describe como escribe el agente en ella; hace falta comprobar en
@@ -52,6 +48,13 @@ es trabajo que un agente puede hacer solo.
 
 ## Cerrados
 
+- [x] 2026-09-26 - Actualizacion verificada: tras el merge del PR #3, un
+      companero integrado con `autoUpdate` activo trajo `4f20a7c` con
+      `marketplace update` y la sesion siguiente cargo esa version. El disparo
+      automatico no se puede simular aqui: corre solo en sesiones
+      interactivas, hasta 10 minutos despues del primer mensaje. De paso: en
+      `claude -p` el plugin carga en segundo plano y falta en el primer turno
+      sin `CLAUDE_CODE_SYNC_PLUGIN_INSTALL=1`; quedo en la guia.
 - [x] 2026-09-26 - `/albert:finalizar` de punta a punta contra un remoto:
       registra la deuda, commitea, mergea, hace push y responde solo `OK`. Con
       un cambio que rompia la sintaxis se nego a mergearlo y lo reporto como
