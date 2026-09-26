@@ -3,12 +3,6 @@
 # "bad interpreter". Node tolera CRLF en el cuerpo, pero no en esa linea.
 *.js    text eol=lf
 
-# Shell scripts must keep LF endings even when checked out on Windows.
-# Otherwise bash on Linux/macOS will fail with "bad interpreter" errors.
-*.sh    text eol=lf
-
-# PowerShell scripts are fine with either, but pin CRLF for Windows tooling.
-*.ps1   text eol=crlf
-
 # Markdown and other text files: let git normalize, default to LF.
 *.md    text eol=lf
+*.json  text eol=lf

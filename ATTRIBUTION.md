@@ -14,7 +14,7 @@ License: MIT
 
 ## What is original here
 
-- Local-only model: files live in a gitignored `Efficiency/` folder so collaborators are not affected.
+- Distribution model: the rules ship as a Claude Code plugin. The base rules are written into each repository's `CLAUDE.md`, and the task profiles load as skills only when a task needs them.
 - All rule wording is rewritten. No paragraph or rule was copied verbatim.
 - Removed: marketing claims, benchmark tables, agents profile, versioned configuration sets, decorative content.
 - Reframed: rules are stated as actions rather than prohibitions wherever possible.

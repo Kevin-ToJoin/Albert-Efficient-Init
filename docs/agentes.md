@@ -1,0 +1,143 @@
+# Subagentes
+
+Tareas que corren en **su propia ventana de contexto** y devuelven solo el
+resultado. Sirven para que la exploracion pesada (barrer el repo, buscar en la
+web, leer veinte archivos) no te ensucie el contexto principal.
+
+Cada uno es un `.md` en `plugin/agents/` y llega solo a todo repo que integre
+el toolkit, con el nombre `albert:<name>`.
+
+> En un plugin, un agente **ignora** `hooks`, `mcpServers` y `permissionMode`
+> del frontmatter. Si un agente necesita un hook o un servidor MCP, van en
+> `plugin/hooks/hooks.json` o en `plugin/.mcp.json`.
+
+## Que guardar aqui
+
+La ganancia de un subagente es una sola: el camino para llegar a la respuesta
+no te ocupa contexto, solo la respuesta. Ese es tambien el criterio para
+decidir si algo merece ser un agente.
+
+### Va aqui
+
+- **Exploracion que ensucia.** Barrer el repo, leer veinte archivos, buscar en
+  la web. Gasta muchisimo contexto y devuelve un parrafo.
+- **Tareas repetibles con salida fija.** Una auditoria, un inventario, un
+  informe que siempre tiene la misma forma.
+- **Trabajo en paralelo o en background**, mientras tu sigues con lo tuyo.
+- **Segundas opiniones sin sesgo.** Como no ve la conversacion, no arrastra tus
+  suposiciones ni las suyas anteriores. Para revisar algo eso es una ventaja,
+  no una limitacion.
+
+### No va aqui
+
+- **Lo que necesita el contexto de la conversacion.** El subagente no ve el
+  historial, ni los archivos que Claude ya leyo, ni las skills ya invocadas. Si
+  la tarea depende de eso, es una **skill**, no un agente.
+- **Un procedimiento que quieres seguir tu**, viendo cada decision. Skill.
+- **Tareas de un paso.** Delegar cuesta un arranque entero; para un `grep` sale
+  mas caro que hacerlo.
+- **Lo que ya hacen los agentes integrados** (`Explore`, `Plan`). Duplicarlos
+  solo crea ambiguedad sobre cual acaba usando Claude.
+
+### Skill, agente o hook
+
+| Quieres... | Es un... |
+|---|---|
+| Un procedimiento que invocas con `/algo` en esta conversacion | skill, en `skills/` |
+| Delegar trabajo pesado y recibir solo el resultado | agente, en `agents/` |
+| Que algo pase solo al ocurrir un evento, sin pedirlo | hook, en `hooks/` |
+
+### Reglas de oro
+
+- **La `description` es lo que decide** si Claude delega. Escribe *cuando*
+  usarlo, no solo que hace.
+- **Recorta `tools` al minimo.** Quitar `Write` y `Edit` es como se garantiza
+  que un agente solo lea.
+- **Di que NO reportar**, y que responder cuando no encuentra nada. Un agente
+  que resume de mas anula la ganancia de contexto, que era todo el punto.
+- **Todo lo que necesite saber va en su prompt.** No puede preguntarte a mitad
+  del trabajo.
+- **Empieza sin agente.** Crea uno cuando te descubras pidiendo la misma
+  exploracion por tercera vez. Un agente escrito "por si acaso" no se usa y
+  compite con los que si.
+
+## Catalogo
+
+| Agente | Para que |
+|---|---|
+| [`albert:auditor-deuda`](../plugin/agents/auditor-deuda.md) | Barre el repo y reporta la deuda tecnica que **no** esta en `deuda-tecnica.md`. Complementa a `/albert:finalizar`, que solo mira la sesion actual. |
+| [`albert:auditor-seguridad`](../plugin/agents/auditor-seguridad.md) | Audita la app contra nueve puntos basicos: secretos, permisos de base de datos, RLS, auth en rutas, validacion de tokens, rate limiting, stack traces filtrados, endpoints de debug y logging. |
+
+> `auditor-seguridad` no solapa con el `/security-review` que trae Claude Code:
+> ese revisa **el diff** de la rama, y este revisa **la app entera** contra una
+> lista fija. Uno mira lo que acabas de cambiar, el otro lo que nunca pusiste.
+
+## Como se invoca
+
+| Forma | Efecto |
+|---|---|
+| "usa el auditor-deuda para revisar esto" | Claude decide si delega |
+| `@agent-albert:auditor-deuda` | Garantiza que corra ese agente |
+| `claude --agent albert:auditor-deuda` | Lo pone como agente principal de la sesion |
+| Solo por la `description` | Claude delega solo si la tarea encaja |
+
+## Formato
+
+```markdown
+---
+name: mi-agente
+description: Que hace y cuando delegarle. Claude lee esto para decidir.
+tools: Read, Grep, Glob, Bash
+model: sonnet
+color: blue
+---
+
+Aqui va el system prompt del agente: quien es, que procedimiento sigue y en
+que formato reporta.
+```
+
+### Frontmatter
+
+| Campo | Para que |
+|---|---|
+| `name` | **Obligatorio.** Minusculas y guiones. Sin `:`, que esta reservado. |
+| `description` | **Obligatorio.** Cuando delegarle. Si pones "usar proactivamente", Claude delega mas. |
+| `tools` | Lista blanca. Si lo omites hereda todas. Quitar `Write`/`Edit` es la forma de garantizar que un agente solo lea. |
+| `disallowedTools` | Lista negra sobre lo heredado. |
+| `model` | `sonnet`, `opus`, `haiku`, `fable`, un ID completo, o `inherit`. |
+| `effort` | `low`, `medium`, `high`, `xhigh`, `max`. |
+| `memory` | `user`, `project` o `local`. Memoria que sobrevive entre conversaciones. |
+| `skills` | Precarga skills por nombre. Ojo: entra la skill **entera** en contexto. |
+| `omitClaudeMd` | `true` para que **no** cargue los `CLAUDE.md`. |
+| `permissionMode` | `default`, `acceptEdits`, `plan`, `bypassPermissions`... |
+| `maxTurns` | Tope de turnos antes de parar. |
+| `isolation` | `worktree` para correr en un worktree de git aislado. |
+| `hooks` | Hooks con el alcance de este agente. |
+| `color` | `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, `cyan`. |
+
+## Lo que no es obvio
+
+- **`/agents` ya no abre el asistente** de creacion desde la v2.1.198. Solo
+  imprime un recordatorio. Los agentes se crean escribiendo el archivo, o
+  pidiendoselo a Claude.
+- **Un subagente no ve la conversacion.** No hereda el historial, ni los
+  archivos que Claude ya leyo, ni las skills ya invocadas. Todo lo que necesite
+  saber tiene que estar en su prompt o en el mensaje de delegacion.
+- **Si carga los `CLAUDE.md`**, toda la jerarquia, salvo que pongas
+  `omitClaudeMd: true`. Por eso importa mantenerlos cortos: entran en el
+  contexto de cada subagente.
+- **Nada de bloques ` ```! `.** La inyeccion de contexto con `!` es de las
+  skills. El cuerpo de un agente es su system prompt y no ejecuta nada. Si
+  necesita estado del repo, que lo consiga el mismo con `Bash`.
+- **Los agentes en background tienen menos herramientas** que los de
+  foreground. Si uno necesita algo raro, tenlo en cuenta.
+- **El nombre tiene que ser unico en todo el arbol**, subcarpetas incluidas. La
+  ruta no da namespace: la identidad sale solo del campo `name`.
+
+## Antes de commitear un agente
+
+- [ ] La `description` dice **cuando** delegarle, no solo que hace.
+- [ ] `tools` recortado a lo minimo. Sin `Write`/`Edit` si solo debe reportar.
+- [ ] Dice explicitamente que **no** reportar, o el agente se vuelve ruido.
+- [ ] Dice que responder cuando no encuentra nada, en una linea.
+- [ ] `claude plugin validate .claude/agents` pasa (v2.1.233+).

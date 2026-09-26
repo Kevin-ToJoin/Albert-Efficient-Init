@@ -1,0 +1,9 @@
+{
+  "name": "albert",
+  "description": "Skills, subagentes, hooks y MCP de Albert-Efficient-Init. /albert:iniciar escribe el CLAUDE.md en el repo destino.",
+  "author": {
+    "name": "Kevin-ToJoin"
+  },
+  "repository": "https://github.com/Kevin-ToJoin/Albert-Efficient-Init",
+  "license": "MIT"
+}

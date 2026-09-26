@@ -1,7 +1,7 @@
 # Deuda tecnica
 
 Registro de pendientes, atajos y decisiones diferidas de este repositorio.
-Lo mantiene el comando `/finalizar` de Claude Code.
+Lo mantiene el comando `/albert:finalizar` de Claude Code.
 
 Convencion: cada item lleva `[M]` si requiere accion manual del usuario
 (credenciales, decision de producto, acceso, algo fuera del repo), o `[A]` si
@@ -9,72 +9,88 @@ es trabajo que un agente puede hacer solo.
 
 ## Abiertos
 
-- [ ] [A] `/finalizar` nunca se ha ejecutado como slash command real. Se probo
-      su bloque `!` por separado y el procedimiento se ejecuto a mano. Falta una
-      corrida de punta a punta despues de engancharlo con la
-      junction. - `skills/finalizar/SKILL.md`
+- [ ] [A] `/albert:finalizar` y `/albert:lanzar-dominio` pasan el chequeo de su
+      bloque `!` y arrancan en una invocacion real (`claude -p` con
+      `--plugin-dir`), pero ninguna se ha visto terminar su procedimiento
+      entero: el merge y push de `finalizar` ni los archivos que genera
+      `lanzar-dominio`. - `plugin/skills/`
+- [ ] [M] El plugin nunca se ha instalado desde GitHub, solo cargado con
+      `--plugin-dir`. Falta, tras el push a `main`: en un repo destino real,
+      `/plugin marketplace add Kevin-ToJoin/Albert-Efficient-Init`, instalar con
+      alcance de proyecto, `/albert:iniciar`, commitear, y que **otra persona**
+      clone el repo y reciba el plugin al aceptar la confianza de la carpeta.
+      Es la promesa central del toolkit y esta sin probar. - `README.md`
+- [ ] [M] Migrar la maquina Windows del modelo de junction. Ahi siguen
+      `~/.claude/skills` y `~/.claude/agents` apuntando a carpetas que ya no
+      existen, y `~/.claude/settings.json` registra los guards con rutas a
+      `hooks/` que tampoco existen: `node` falla en cada Bash con un error no
+      bloqueante y **los guards dejan de proteger**. Quitar
+      las dos junctions y el bloque de hooks, e integrar el plugin.
+- [ ] [A] `"autoUpdate": true` en el `.claude/settings.json` del repo destino
+      esta documentado para cualquier archivo de settings, pero no se ha visto
+      actualizar nada: hace falta un push, abrir sesion en un repo integrado y
+      ver `Plugin updated`. Sin eso, el fallback es
+      `/plugin marketplace update albert-efficient-init`. - `plugin/skills/iniciar/SKILL.md`
+- [ ] [A] `/albert:iniciar` no puede escribir `.claude/settings.json` en una
+      sesion no interactiva: Claude Code protege `.claude/` y lo deniega aun con
+      `acceptEdits`. En interactiva pide confirmacion, que es lo correcto, pero
+      no se ha probado ese camino. - `plugin/skills/iniciar/SKILL.md`
 - [ ] [A] `auditor-deuda` nunca se ha ejecutado. Se escribio contra la
       referencia de subagentes pero no se ha invocado ni una vez, asi que no se
       sabe si el reporte sale en el formato pedido ni si el cruce contra
-      `## Abiertos` filtra bien. - `agents/auditor-deuda.md`
+      `## Abiertos` filtra bien. - `plugin/agents/auditor-deuda.md`
 - [ ] [A] El campo `memory: project` de `auditor-deuda` esta puesto sin
       verificar. La referencia lo documenta como alcance de memoria persistente
       pero no describe como escribe el agente en ella; hace falta comprobar en
       dos sesiones distintas si de verdad recuerda algo. Si no funciona, el
-      unico efecto es que no recuerda nada. - `agents/auditor-deuda.md:7`
-- [ ] [M] Los guards se portaron a Node para que corran en los tres sistemas,
-      pero **solo se han ejecutado en Windows**. No usan nada especifico de
-      plataforma y las rutas van por `path.join`, asi que deberian correr igual
-      en macOS y Linux, pero eso es inspeccion, no prueba. En esta maquina hay
-      WSL con Ubuntu y kali y esta instalado Docker, pero ninguna de las tres
-      tiene Node y el demonio de Docker no arranca, asi que no se pudo cerrar
-      aqui. Correr `node hooks/guards.test.js` en un Mac, en una sesion remota,
-      o en un contenedor `node:22` lo cierra. - `hooks/guards.test.js`
+      unico efecto es que no recuerda nada. - `plugin/agents/auditor-deuda.md:7`
 - [ ] [A] La forma `exec` del registro (`command` + `args`) sigue sin probarse.
       La doc la recomienda pero no dice desde que version existe `args`, asi que
       el registro real se hizo con la forma shell, que si esta verificada en la
       2.1.201. Si algun dia se confirma `exec`, es marginalmente mas robusto con
-      rutas raras. - `hooks/README.md`
+      rutas raras. - `docs/hooks.md`
 - [ ] [A] `auditor-seguridad` nunca se ha ejecutado contra un proyecto real.
       Los nueve puntos y el formato de reporte estan escritos, pero no se sabe
       si distingue bien "no esta" de "no lo veo", que es lo unico que lo hace
       util. Probarlo contra una app con base de datos, no contra este
-      repo. - `agents/auditor-seguridad.md`
-- [ ] [A] `/lanzar-dominio` no se ha invocado como slash command. Su bloque `!`
-      si esta probado en cuatro estados de proyecto (vacio, con `package.json`,
-      con carpeta publica, y este repo) y sale `EXIT=0` en los
-      cuatro. - `skills/lanzar-dominio/SKILL.md`
+      repo. - `plugin/agents/auditor-seguridad.md`
 - [ ] [A] La lista de nueve puntos de `auditor-seguridad` se reconstruyo desde
       capturas donde solo se veian numerados el 6 al 10; los otros cuatro salen
       de slides sueltas. El contenido es estandar y se sostiene solo, pero la
       numeracion puede no coincidir con la lista
-      original. - `agents/auditor-seguridad.md`
-- [ ] [A] La plantilla de `mcp/` no se ha probado contra ningun servidor real.
+      original. - `plugin/agents/auditor-seguridad.md`
+- [ ] [A] La plantilla de `docs/mcp.json.ejemplo` no se ha probado contra ningun servidor real.
       Las cuatro formas de transporte salen de la doc oficial y el JSON parsea,
       pero nadie ha levantado un servidor con ella. En particular no se ha
       comprobado en la practica el filtro anti-fuga de variables con `KEY` o
-      `TOKEN` en el nombre. - `mcp/mcp.json.ejemplo`
-- [ ] [A] Confirmar que `allowed-tools: Bash(git *) ...` pre-aprueba de verdad.
-      La doc de slash commands usa esa forma con espacio; la de permisos en
-      `settings.json` usa `Bash(git:*)` con dos puntos. Si la forma es
-      incorrecta el unico efecto es que salen prompts de confirmacion, no un
-      fallo. - `skills/finalizar/SKILL.md:6`
+      `TOKEN` en el nombre. - `docs/mcp.json.ejemplo`
 - [ ] [A] No hay CI. Lo unico que queda mecanicamente testeable tras quitar los
       instaladores es el extract-and-run de los bloques `!` de cada `SKILL.md`
       en los cuatro estados de repo. Un workflow minimo lo
       cubriria. - `.github/workflows/` (no existe)
 - [ ] [A] El checklist de comandos nuevos es manual; no hay script que lo
       ejecute. - `docs/comandos.md:131`
-- [ ] [A] Al quitar `install.sh --rules` las reglas de `rules/` se copian a mano.
-      Un comando `/init-reglas` que las escriba en el repo actual y añada las
-      dos lineas al `.gitignore` recuperaria esa comodidad sin reintroducir un
-      instalador. Es justo el tipo de cosa para la que sirve `skills/`.
-- [ ] [M] Nada verifica que la junction `~/.claude/skills` este puesta. Si no lo
-      esta, los comandos simplemente no aparecen y no hay mensaje de error que
-      lo explique. El README lo documenta, pero es un paso manual y silencioso.
 
 ## Cerrados
 
+- [x] 2026-09-26 - Las tres skills con bloque `!` fallaban como slash command
+      real, aunque su bloque daba `EXIT=0` en bash en los cuatro estados.
+      Claude Code pasa el bloque por su chequeo de permisos y rechazaba los
+      grupos `{ ...; }` ("expansion obfuscation" y `compound_statement`), un
+      pipe dentro de un `if` de una linea, y `grep`, `head` y `cut` por no estar
+      en `allowed-tools`. Reescritos los tres bloques; verificados con
+      `claude -p` y `--plugin-dir`. De paso, `finalizar` mandaba revisar una
+      seccion `archivos-tocados-vs-HEAD` que no existia. - `plugin/skills/`
+- [x] 2026-09-26 - `allowed-tools: Bash(grep *)` con espacio si pre-aprueba:
+      agregarlo fue lo que desbloqueo el bloque de `iniciar` en `-p`.
+- [x] 2026-09-26 - Los guards corren fuera de Windows: los 47 casos pasan en
+      macOS, y registrados desde `plugin/hooks/hooks.json` bloquearon un
+      `git branch -D` en una sesion real, con el mensaje llegando a Claude.
+- [x] 2026-09-26 - Las reglas ya no se copian a mano: `/albert:iniciar` escribe
+      el `CLAUDE.md` en el repo destino y los perfiles son skills.
+- [x] 2026-09-26 - Desaparece el pendiente de la junction silenciosa: ya no hay
+      junction. Un plugin que no carga aparece en la pestaña Errors de
+      `/plugin`.
 - [x] 2026-09-19 - Falso positivo de `guard-secretos`, encontrado en su primer
       uso real y costo dos intentos. Bloqueo un `git commit` cuyo **mensaje**
       mencionaba `git add .env`: hablar de un archivo no es commitearlo. El
@@ -125,6 +141,38 @@ es trabajo que un agente puede hacer solo.
       Convertidos a bloques `if`.
 
 ## Bitacora
+
+### 2026-09-26 - rama `toolkit-plugin` (alcance definitivo)
+
+Se fija el alcance del proyecto: **un toolkit que se integra en cualquier otro
+repositorio** y le llega a todo su equipo, con skills, subagentes, hooks, MCP y
+la plantilla de `CLAUDE.md`. Todo el repo se reescribio para apuntar ahi.
+
+Venia de dos rumbos que chocaron en `main`: el toolkit de junctions a
+`~/.claude` (global, personal) y un commit que lo convertia en libro de
+consulta. El libro (`book/`) y el archivo de iteraciones (`archive/`) se
+borraron; siguen en el historial y en la rama local `backup/main-local-e87620b`.
+El modo global por junction tambien se quito.
+
+El mecanismo es el plugin de Claude Code, que la vuelta del 18 habia
+descartado. La diferencia es que entonces venia envuelto en cinco scripts de
+instalacion; ahora el plugin es el unico mecanismo y no hay instalador. Lo
+decidio la documentacion: un plugin cuyo marketplace lo declara con ruta
+relativa se carga solo en cuanto un colaborador confia en la carpeta, asi que
+integrar el toolkit en un repo es commitear un `.claude/settings.json` de diez
+lineas. Nada mas da eso.
+
+Tres cosas de la doc condicionaron la estructura: un `CLAUDE.md` en la raiz de
+un plugin no se carga, por eso el plugin vive en `plugin/` y el `CLAUDE.md` lo
+escribe la skill nueva `/albert:iniciar`; sin `version`, los repos siguen los
+commits, por eso no se declara; y los perfiles, que eran archivos a copiar, se
+volvieron skills que Claude carga solo cuando aplican.
+
+Probarlo de verdad destapo que ninguna de las skills con bloque `!` habia
+funcionado nunca como comando real. Queda anotado en Cerrados y en
+`docs/comandos.md`, con la prueba que si lo detecta.
+
+Nuevos pendientes: 5 | Cerrados: 5
 
 ### 2026-09-18 - rama `seguridad-y-dominio`
 

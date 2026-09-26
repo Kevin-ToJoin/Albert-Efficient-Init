@@ -39,10 +39,15 @@ archivo, asi que no gasta contexto. Las notas para humanos van aqui.
 
 # Albert-Efficient-Init
 
-Toolkit personal de comandos, subagentes, hooks y reglas para Claude Code. El
-repo es **contenido puro**: no hay instalador ni build. Casi todo son archivos
-Markdown que Claude Code carga desde otro sitio; la unica excepcion son los
-scripts de `hooks/`, que si son codigo y si tienen pruebas.
+Toolkit de Claude Code que se integra en **cualquier otro repositorio** como
+plugin: skills, subagentes, hooks, MCP y la plantilla de `CLAUDE.md`. Ese es el
+alcance entero del proyecto. No es un libro de consulta ni una configuracion
+personal de `~/.claude`: todo lo que se agregue aqui tiene que poder viajar a un
+repo ajeno y servirle a su equipo.
+
+El repo es **contenido puro**: no hay instalador ni build. Casi todo son
+archivos Markdown y JSON que Claude Code carga como plugin; la unica excepcion
+son los scripts de `plugin/hooks/`, que si son codigo y si tienen pruebas.
 
 La documentacion de este repo esta en espanol. Mantenla asi.
 
@@ -50,73 +55,95 @@ La documentacion de este repo esta en espanol. Mantenla asi.
 
 Las que este repo distribuye a otros proyectos, aplicadas aqui tambien:
 
-@rules/CLAUDE-root-template.md
-
-Con una correccion de ruta: aqui los perfiles viven en `rules/Efficiency/`, no
-en `Efficiency/`.
+@plugin/skills/iniciar/CLAUDE-plantilla.md
 
 ## Antes de afirmar como funciona Claude Code
 
 El tema de este repo *es* la configuracion de Claude Code, asi que una
 suposicion equivocada no se queda en un bug: se convierte en documentacion
-equivocada que despues se copia a otros repos.
+equivocada que despues llega a otros repos.
 
-**Verifica en la documentacion antes de afirmar** como funcionan las skills,
-los hooks, `settings.json`, los permisos o los imports de `CLAUDE.md`. No
-respondas de memoria. La URL vigente es `https://code.claude.com/docs/en/` —
-las de `docs.claude.com/en/docs/claude-code/` redirigen ahi.
+**Verifica en la documentacion antes de afirmar** como funcionan los plugins,
+las skills, los hooks, `settings.json`, los permisos o los imports de
+`CLAUDE.md`. No respondas de memoria. La URL vigente es
+`https://code.claude.com/docs/en/`; cada pagina tiene su version `.md` para
+leerla con `curl`.
 
-Tres supuestos que ya salieron falsos en este repo: `commands/*.md` esta
-marcado legacy frente a `skills/<n>/SKILL.md`; `$HOME` es de solo lectura en
-PowerShell 5.1; y los hooks no pueden ser file-drop, siempre necesitan una
-entrada en `settings.json`.
+Supuestos que ya salieron falsos en este repo: `commands/*.md` esta marcado
+legacy frente a `skills/<n>/SKILL.md`; `$HOME` es de solo lectura en
+PowerShell 5.1; y un `CLAUDE.md` en la raiz de un plugin **no se carga**.
 
-## Cinco carpetas, tres mecanicas distintas
+## Como esta armado
 
-Es lo que mas se presta a error. Cada una llega a Claude Code por una via
-diferente:
+Dos capas, y es lo que mas se presta a error:
 
-| Carpeta | Como llega | Implicacion |
+| Ruta | Que es | Llega a los repos destino |
 |---|---|---|
-| `skills/` | Junction: `~/.claude/skills` apunta aqui | Editar un `SKILL.md` cambia el comando **en vivo y en todos los repos** del usuario |
-| `agents/` | Junction: `~/.claude/agents` apunta aqui | Igual que las skills. Los archivos sin `name` en el frontmatter se ignoran como documentacion |
-| `hooks/` | No llega sola | Necesita una entrada en `settings.json`. No existe carpeta auto-cargable |
-| `mcp/` | No llega sola | Se copia a `.mcp.json` del proyecto, o se registra con `claude mcp add` |
-| `rules/` | No llega sola | Se copia a mano al proyecto que la quiera |
+| `.claude-plugin/marketplace.json` | El catalogo. Un solo plugin, `albert`, con `source: "./plugin"` | Si, es lo que registran |
+| `plugin/` | El plugin. Todo lo que se distribuye vive aqui | Si, entero |
+| `docs/`, `CLAUDE.md`, `README.md`, `deuda-tecnica.md` | Como trabajar en este repo | **No** |
 
-Cada una tiene su `README.md` con que merece guardarse ahi y que no. Si vas a
-crear algo nuevo, leelo antes: la confusion tipica es meter en `skills/` algo
-que deberia ser un agente o un hook.
+Dentro de `plugin/`, cada pieza por su via:
+
+| Pieza | Ruta | Como llega |
+|---|---|---|
+| Skills | `plugin/skills/<n>/SKILL.md` | Solas, como `/albert:<n>` |
+| Subagentes | `plugin/agents/<n>.md` | Solos, como `@agent-albert:<n>` |
+| Hooks | `plugin/hooks/hooks.json` | Solos. Los scripts se referencian con `${CLAUDE_PLUGIN_ROOT}` |
+| MCP | `plugin/.mcp.json` | Solos. Hoy vacio a proposito |
+| CLAUDE.md | `plugin/skills/iniciar/CLAUDE-plantilla.md` | **No llega solo.** Lo escribe `/albert:iniciar` en el repo destino |
+
+Cada pieza tiene su guia en `docs/` con que merece guardarse ahi y que no. Si
+vas a crear algo nuevo, leela antes: la confusion tipica es meter en `skills/`
+algo que deberia ser un agente o un hook.
 
 ## Lo que no es obvio
 
-- **No reintroduzcas un instalador.** Habia cinco scripts, un marketplace y un
-  plugin; se borraron a proposito y se cambiaron por la junction. El motivo
-  esta en la bitacora de `deuda-tecnica.md`. Actualizar es `git pull`.
-- **Un comando es un directorio con `SKILL.md`**, no un `.md` suelto. El nombre
-  del comando sale del directorio, no del campo `name` del frontmatter.
-- **`rules/CLAUDE-root-template.md` se llama asi a proposito.** Si se llamara
-  `CLAUDE.md`, Claude Code lo auto-cargaria al trabajar dentro de `rules/`. No
-  lo renombres. Ademas el `CLAUDE.md` de la raiz lo importa, asi que editarlo
-  cambia tambien como se comporta Claude aqui.
-- **Los hooks tienen una alternativa file-drop**: declararlos en el frontmatter
-  de una skill. Esos si viajan con un `git pull` y no tocan ningun
-  `settings.json`.
+- **Un push a `main` es un release.** El plugin no declara `version` a
+  proposito: asi los repos destino siguen los commits. No agregues `version` a
+  `plugin.json` ni al `marketplace.json` salvo que se decida versionar, porque
+  desde ese momento un commit sin subir la version no le llega a nadie.
+  `claude plugin validate` avisa de que falta; es esperado.
+- **No renombres el plugin `albert` ni el marketplace `albert-efficient-init`.**
+  Son las claves que los repos destino tienen en su `.claude/settings.json`.
+  Renombrar rompe todas las integraciones; si hiciera falta, va con el mapa
+  `renames` del `marketplace.json`.
+- **Nada dentro de `plugin/` puede salir de `plugin/`.** El plugin se copia a
+  una cache y las rutas con `..` no cargan. Lo que compartan varias skills se
+  referencia con `${CLAUDE_PLUGIN_ROOT}`.
+- **Nada de `CLAUDE.md` ni `README.md` dentro de `plugin/`.** El primero no se
+  carga y el validador lo marca; las guias de autor van en `docs/`.
+- **`CLAUDE-plantilla.md` se llama asi a proposito.** Si se llamara
+  `CLAUDE.md`, Claude Code lo cargaria al trabajar dentro de su carpeta. El
+  `CLAUDE.md` de la raiz lo importa, asi que editarlo cambia tambien como se
+  comporta Claude aqui. Tiene que seguir siendo autocontenido: en el repo
+  destino va solo.
+- **No reintroduzcas un instalador.** El plugin es el mecanismo de
+  distribucion; los scripts, las junctions y el modo global se quitaron a
+  proposito. El motivo esta en la bitacora de `deuda-tecnica.md`.
 - **Una skill no es un agente.** Una skill es un procedimiento que se inyecta
   en *esta* conversacion y admite bloques ` ```! `. Un agente corre en su
   propio contexto, no ve nada de la conversacion, y su cuerpo es un system
-  prompt que **no ejecuta nada**: los bloques `!` ahi no hacen lo que parece.
+  prompt que **no ejecuta nada**. En un plugin, los agentes ignoran
+  `hooks`, `mcpServers` y `permissionMode` del frontmatter.
 - **Cada subagente carga los `CLAUDE.md` completos** salvo que lleve
-  `omitClaudeMd: true`. Este archivo entra en su contexto tambien, asi que
-  mantenerlo corto importa mas de lo que parece.
+  `omitClaudeMd: true`. La plantilla entra en el contexto de cada agente en
+  cada repo destino, asi que mantenerla corta importa mas de lo que parece.
 
 ## Como se verifica lo que hay aqui
 
-Los unicos tests son los de los hooks, porque un `PreToolUse` mal escrito
-bloquea todas las herramientas:
+El plugin y el marketplace se validan con el CLI:
 
 ```bash
-node hooks/guards.test.js
+claude plugin validate .
+claude plugin validate ./plugin
+```
+
+Los unicos tests son los de los hooks, porque un `PreToolUse` mal escrito
+bloquea todas las herramientas **en todos los repos que integran el toolkit**:
+
+```bash
+node plugin/hooks/guards.test.js
 ```
 
 Correlo siempre que toques un guard. Buena parte de sus 47 casos comprueban lo
@@ -124,14 +151,15 @@ que **no** debe bloquear, que es donde estan los errores caros: una version
 anterior bloqueaba `git branch -d`, que es la variante segura, y el de secretos
 tiene que dejar pasar los `.env.example`.
 
-Lo demas se verifica a mano. Los bloques ` ```! ` de una skill se ejecutan
-**antes** de que Claude la vea, y **si salen != 0 abortan la invocacion
-entera**. Termina siempre en `true` y protege cada linea con `||`.
+Para probar el plugin entero sin publicarlo: `claude --plugin-dir ./plugin`.
 
-Antes de commitear un comando, extrae el bloque y correlo:
+Los bloques ` ```! ` de una skill se ejecutan **antes** de que Claude la vea, y
+**si salen != 0 abortan la invocacion entera**. Termina siempre en `true` y
+protege cada linea con `||`. Antes de commitear una skill, extrae el bloque y
+correlo:
 
 ```bash
-awk '/^```!$/{f=1;next} f&&/^```$/{exit} f' skills/<nombre>/SKILL.md > /tmp/probe.sh
+awk '/^```!$/{f=1;next} f&&/^```$/{exit} f' plugin/skills/<nombre>/SKILL.md > /tmp/probe.sh
 bash /tmp/probe.sh; echo "EXIT=$?"
 ```
 
@@ -139,10 +167,18 @@ En cuatro estados: repo normal con rama de trabajo, repo sin `main` ni
 `master`, directorio que no es git, y repo sin ningun commit. Los cuatro deben
 dar `EXIT=0`.
 
+**Eso no basta.** Claude Code pasa el bloque por su chequeo de permisos antes
+de correrlo, y rechaza cosas que `bash` acepta: grupos `{ ...; }`, pipes dentro
+de un `if` de una linea, y cualquier ejecutable que no este en `allowed-tools`.
+Las tres skills originales daban `EXIT=0` y ninguna corria. Invocala de verdad:
+`claude -p "/albert:<nombre>" --plugin-dir ./plugin --max-turns 1` y busca
+`permission check failed` en la salida. Detalle en `docs/comandos.md`.
+
 ## Entorno
 
-Este toolkit se usa desde **varias maquinas** (Windows, macOS, Linux) y desde
-sesiones remotas. Nada de lo que se agregue aqui puede asumir un solo sistema.
+Este toolkit corre en **las maquinas de cualquiera que integre el repo
+destino**: Windows, macOS, Linux y sesiones remotas. Nada de lo que se agregue
+aqui puede asumir un solo sistema.
 
 - **Los hooks van en Node**, sin dependencias. Es lo unico del repo que se
   ejecuta, y un hook lo lanza el sistema operativo, no Claude Code: un `.ps1`
@@ -158,8 +194,9 @@ sesiones remotas. Nada de lo que se agregue aqui puede asumir un solo sistema.
 - Mensajes en espanol, imperativo, una linea de asunto y cuerpo que explique el
   **por que**, no el que. Sin prefijos de herramienta.
 - **Sin linea `Co-Authored-By`.** El historial no la usa; no la agregues.
-- Nunca hagas push sin confirmarlo antes con el usuario.
-- `deuda-tecnica.md` lo mantiene el comando `/finalizar`. Lo que quede a medias,
+- Nunca hagas push sin confirmarlo antes con el usuario. Aqui un push a `main`
+  le llega a todos los repos que integran el toolkit.
+- `deuda-tecnica.md` lo mantiene `/albert:finalizar`. Lo que quede a medias,
   sin verificar o decidido a medias va ahi, con `[M]` si requiere accion manual
   del usuario o `[A]` si un agente puede cerrarlo solo. No lo repitas en el chat
   si ya quedo escrito en el archivo.

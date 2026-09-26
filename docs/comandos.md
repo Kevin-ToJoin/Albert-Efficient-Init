@@ -1,25 +1,25 @@
 # Agregar comandos
 
-Un comando nuevo es un directorio con un `SKILL.md` dentro de `skills/`. Nada
-más:
+Un comando nuevo es un directorio con un `SKILL.md` dentro de `plugin/skills/`.
+Nada más:
 
 ```bash
-mkdir -p skills/mi-comando
-$EDITOR skills/mi-comando/SKILL.md
+mkdir -p plugin/skills/mi-comando
+$EDITOR plugin/skills/mi-comando/SKILL.md
 ```
 
-Si enganchaste `skills/` con una junction (ver el [README](../README.md)), el
-comando ya existe: no hay que copiar ni instalar nada. En una sesión que ya
-estaba abierta, corre `/reload-plugins` para que aparezca.
+Para probarlo antes de publicarlo, arranca Claude Code con
+`claude --plugin-dir ./plugin`. En una sesión que ya estaba abierta, corre
+`/reload-plugins` para que aparezca. Cuando llega a `main`, les llega a todos
+los repos que integran el toolkit.
 
 ## De dónde sale el nombre
 
-Del **nombre del directorio**, no del campo `name` del frontmatter:
-`skills/mi-comando/` → `/mi-comando`.
+Del **nombre del directorio**, con el nombre del plugin como prefijo:
+`plugin/skills/mi-comando/` → `/albert:mi-comando`.
 
-La invocación no distingue mayúsculas: `/finalizar` y `/Finalizar` son lo mismo.
-Si el mismo nombre existe en varios sitios, gana el personal
-(`~/.claude/skills/`) sobre el del proyecto (`<proyecto>/.claude/skills/`).
+El prefijo evita choques: un `/finalizar` que el repo destino tenga en su
+propio `.claude/skills/` convive con `/albert:finalizar` sin pisarse.
 
 ## Formato
 
@@ -32,7 +32,7 @@ disable-model-invocation: true
 allowed-tools: Bash(git *) Read Write Edit
 ---
 
-# /mi-comando
+# /albert:mi-comando
 
 Argumentos recibidos: `$ARGUMENTS`
 
@@ -63,7 +63,7 @@ Qué decirle al usuario, y qué callarse.
 | `allowed-tools` | Pre-aprueba herramientas para no confirmar a cada paso. |
 | `model` / `effort` | Forzar modelo o nivel de esfuerzo. |
 | `arguments` | Lista de nombres para usar `$nombre` en vez de `$1`. |
-| `hooks` | Hooks activos desde que se invoca la skill. Ver [hooks/](../hooks/README.md). |
+| `hooks` | Hooks activos desde que se invoca la skill. Ver [hooks.md](hooks.md). |
 
 ### Argumentos
 
@@ -92,7 +92,7 @@ git log --oneline HEAD --not main 2>/dev/null \
 true
 ```
 
-Errores reales que costaron una iteración escribiendo `/finalizar`:
+Errores reales que costaron una iteración escribiendo `/albert:finalizar`:
 
 - `git log HEAD --not main master` falla entero si `master` no existe, así que
   devolvía vacío en cualquier repo moderno. Hay que encadenar con `||`, no
@@ -103,11 +103,28 @@ Errores reales que costaron una iteración escribiendo `/finalizar`:
   sale 128. Para detectar la rama usa `git symbolic-ref --short -q HEAD`, que
   funciona en repos vacíos.
 
+### Claude Code revisa el bloque antes de correrlo
+
+Antes de ejecutar un bloque `!`, Claude Code lo pasa por el mismo chequeo de
+permisos que cualquier comando de Bash. Si no lo aprueba, **el comando no
+corre** y el modelo ni se entera. En una sesion interactiva te pide permiso; en
+una no interactiva simplemente no pasa nada. Tres reglas que salieron de
+encontrarlo en las tres skills del toolkit, que `bash` daba por buenas:
+
+- **Sin grupos `{ ...; }`.** Una llave con comillas dentro se rechaza como
+  "expansion obfuscation", y un grupo sin comillas como `compound_statement`.
+  Usa `if ... fi` de una linea o lineas sueltas con `|| true`.
+- **Sin pipes dentro de un `if` de una linea.** El analizador corta mal
+  `if ...; then a | b; else ...; fi` y pide aprobacion para un trozo sin
+  sentido. Saca el pipe fuera del `if`.
+- **Cada ejecutable del bloque en `allowed-tools`.** `grep`, `head`, `cut`: si
+  no estan como `Bash(grep *)`, no se aprueban solos.
+
 Pruébalo antes de commitear, extrayendo el bloque tal cual:
 
 ```bash
 awk '/^```!$/{f=1;next} f&&/^```$/{exit} f' \
-  skills/mi-comando/SKILL.md > /tmp/probe.sh
+  plugin/skills/mi-comando/SKILL.md > /tmp/probe.sh
 bash /tmp/probe.sh; echo "EXIT=$?"
 ```
 
@@ -115,9 +132,22 @@ Corre eso en al menos cuatro estados: repo normal con rama de trabajo, repo sin
 `main` ni `master`, directorio que no es repo git, y repo recién inicializado sin
 commits. Los cuatro deben salir `EXIT=0`.
 
+Eso prueba el shell, no el chequeo de Claude Code. Para ese, invócalo de verdad
+con el plugin local, en una carpeta de prueba:
+
+```bash
+claude -p "/albert:mi-comando" --plugin-dir <ruta-al-repo>/plugin \
+  --permission-mode acceptEdits --max-turns 1 --output-format stream-json --verbose
+```
+
+Si la salida trae un `local-command-stderr` con `Shell command permission check
+failed`, el bloque no paso: el motivo viene al final de ese mensaje.
+
 ## Checklist antes de commitear un comando
 
+- [ ] `claude plugin validate ./plugin` pasa.
 - [ ] Los bloques `!` salen 0 en los cuatro estados de arriba.
+- [ ] Invocado con `claude -p` y `--plugin-dir` sin `permission check failed`.
 - [ ] `disable-model-invocation: true` si el comando escribe, commitea o empuja.
 - [ ] La `description` dice cuándo usarlo, no solo qué hace.
 - [ ] El comando dice explícitamente **qué no reportar**. Si no, Claude resume de
