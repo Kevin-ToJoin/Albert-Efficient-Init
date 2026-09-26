@@ -136,6 +136,10 @@ algo que deberia ser un agente o un hook.
 
 ## Como se verifica lo que hay aqui
 
+**Cada PR corre el CI** (`.github/workflows/ci.yml`): tests de hooks, bloques
+`!` de las skills (`.github/probar-bloques.sh`), JSON validos y
+`claude plugin validate`. Localmente, lo mismo por partes.
+
 El plugin y el marketplace se validan con el CLI:
 
 ```bash

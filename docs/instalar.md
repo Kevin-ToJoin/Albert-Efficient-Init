@@ -40,7 +40,7 @@ if [ -e .claude/settings.json ]; then echo "Ya existe .claude/settings.json: ve 
 **Windows (PowerShell):**
 
 ```powershell
-if (Test-Path .claude\settings.json) { "Ya existe .claude\settings.json: ve al caso de abajo." } else { New-Item -ItemType Directory -Force .claude | Out-Null; [Net.ServicePointManager]::SecurityProtocol = 'Tls12'; Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json -OutFile .claude\settings.json; "Listo." }
+if (Test-Path .claude/settings.json) { "Ya existe .claude/settings.json: ve al caso de abajo." } else { New-Item -ItemType Directory -Force .claude | Out-Null; [Net.ServicePointManager]::SecurityProtocol = 'Tls12'; Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json -OutFile .claude/settings.json; "Listo." }
 ```
 
 **Si tu repo ya tenia `.claude/settings.json`**, no lo reemplaces: ahi puede

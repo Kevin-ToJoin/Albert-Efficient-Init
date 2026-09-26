@@ -1,0 +1,46 @@
+# Cada cambio a main le llega a todos los repos que integran el toolkit, asi
+# que nada entra sin pasar por aqui.
+#
+# pull_request y no pull_request_target: un PR desde un fork corre sin acceso
+# a secretos ni permisos de escritura. Las acciones van fijadas por SHA, no por
+# etiqueta, porque una etiqueta se puede mover.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Tests de los hooks
+        run: node plugin/hooks/guards.test.js
+
+      - name: Bloques ! de las skills
+        run: bash .github/probar-bloques.sh
+
+      - name: JSON validos
+        run: |
+          for f in .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json plugin/hooks/hooks.json plugin/.mcp.json instalar/settings.json; do
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" && echo "ok  $f"
+          done
+
+      - name: Validar plugin y marketplace
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate .
+          claude plugin validate ./plugin

@@ -48,6 +48,11 @@ true
 Ejecuta los pasos en orden. Si un paso falla, **no abortes el resto**: anota el
 fallo como pendiente manual y sigue con lo que si se pueda hacer.
 
+**Un comando git por llamada.** Sin encadenar con `&&` ni `;`, y sin saltos de
+linea dentro de las comillas: asi cada comando calza con `Bash(git *)` y no hay
+que pedirle permiso al usuario a mitad del cierre. Para el cuerpo del mensaje
+de commit usa un segundo `-m` en vez de un salto de linea.
+
 ### 0. Verificar que aplica
 
 - `rama-actual` = `NO-ES-REPO-GIT`: para aqui y di solo
