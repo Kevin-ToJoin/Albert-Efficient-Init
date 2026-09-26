@@ -9,11 +9,9 @@ es trabajo que un agente puede hacer solo.
 
 ## Abiertos
 
-- [ ] [A] `/albert:finalizar` y `/albert:lanzar-dominio` pasan el chequeo de su
-      bloque `!` y arrancan en una invocacion real (`claude -p` con
-      `--plugin-dir`), pero ninguna se ha visto terminar su procedimiento
-      entero: el merge y push de `finalizar` ni los archivos que genera
-      `lanzar-dominio`. - `plugin/skills/`
+- [ ] [M] El comando de una linea para Windows funciona en PowerShell 7.6, pero
+      falta PowerShell 5.1, la que trae Windows. Lo unico propio de 5.1 es la
+      linea de TLS. Probarlo en la maquina Windows. - `docs/instalar.md`
 - [ ] [M] Migrar la maquina Windows del modelo de junction. Ahi siguen
       `~/.claude/skills` y `~/.claude/agents` apuntando a carpetas que ya no
       existen, y `~/.claude/settings.json` registra los guards con rutas a
@@ -25,24 +23,10 @@ es trabajo que un agente puede hacer solo.
 - [ ] [M] En GitHub, Settings > Emails: activar "Keep my email addresses
       private" y "Block command line pushes that expose my email". Es lo que
       impide que el correo personal vuelva a colarse desde cualquier maquina.
-- [ ] [M] Confirmar que la cuenta `Kevin-ToJoin` tiene 2FA. Quien controle la
-      cuenta controla `main`, y `main` se ejecuta en todos los repos
-      integrados. No se pudo verificar desde aqui: el token no tiene permiso
-      para leerlo.
 - [ ] [A] `"autoUpdate": true` no se ha visto actualizar nada: hace falta un
       merge, abrir sesion en un repo integrado y ver `Plugin updated`. Sin
       eso, el fallback es `/plugin marketplace update albert-efficient-init`.
       - `instalar/settings.json`
-- [ ] [M] El comando de una linea para Windows (PowerShell 5.1) no se ha
-      ejecutado: en la Mac no hay PowerShell. Probarlo en la maquina Windows,
-      en un repo con y sin `.claude/settings.json`. - `docs/instalar.md`
-- [ ] [A] La URL del comando `curl` apunta a `main`, asi que solo existe desde
-      el merge de `instalar/settings.json`. Tras el merge, correrlo una vez
-      contra la URL real. - `docs/instalar.md`
-- [ ] [A] `auditor-deuda` nunca se ha ejecutado. Se escribio contra la
-      referencia de subagentes pero no se ha invocado ni una vez, asi que no se
-      sabe si el reporte sale en el formato pedido ni si el cruce contra
-      `## Abiertos` filtra bien. - `plugin/agents/auditor-deuda.md`
 - [ ] [A] El campo `memory: project` de `auditor-deuda` esta puesto sin
       verificar. La referencia lo documenta como alcance de memoria persistente
       pero no describe como escribe el agente en ella; hace falta comprobar en
@@ -53,11 +37,6 @@ es trabajo que un agente puede hacer solo.
       el registro real se hizo con la forma shell, que si esta verificada en la
       2.1.201. Si algun dia se confirma `exec`, es marginalmente mas robusto con
       rutas raras. - `docs/hooks.md`
-- [ ] [A] `auditor-seguridad` nunca se ha ejecutado contra un proyecto real.
-      Los nueve puntos y el formato de reporte estan escritos, pero no se sabe
-      si distingue bien "no esta" de "no lo veo", que es lo unico que lo hace
-      util. Probarlo contra una app con base de datos, no contra este
-      repo. - `plugin/agents/auditor-seguridad.md`
 - [ ] [A] La lista de nueve puntos de `auditor-seguridad` se reconstruyo desde
       capturas donde solo se veian numerados el 6 al 10; los otros cuatro salen
       de slides sueltas. El contenido es estandar y se sostiene solo, pero la
@@ -68,15 +47,31 @@ es trabajo que un agente puede hacer solo.
       pero nadie ha levantado un servidor con ella. En particular no se ha
       comprobado en la practica el filtro anti-fuga de variables con `KEY` o
       `TOKEN` en el nombre. - `docs/mcp.json.ejemplo`
-- [ ] [A] No hay CI. Lo unico que queda mecanicamente testeable tras quitar los
-      instaladores es el extract-and-run de los bloques `!` de cada `SKILL.md`
-      en los cuatro estados de repo. Un workflow minimo lo
-      cubriria. - `.github/workflows/` (no existe)
 - [ ] [A] El checklist de comandos nuevos es manual; no hay script que lo
       ejecute. - `docs/comandos.md:131`
 
 ## Cerrados
 
+- [x] 2026-09-26 - `/albert:finalizar` de punta a punta contra un remoto:
+      registra la deuda, commitea, mergea, hace push y responde solo `OK`. Con
+      un cambio que rompia la sintaxis se nego a mergearlo y lo reporto como
+      pendiente manual. Encadenaba comandos git con `&&`, lo que en una sesion
+      normal pedia permiso a mitad del cierre: ahora la skill pide uno por
+      llamada.
+- [x] 2026-09-26 - `/albert:lanzar-dominio` de punta a punta en un proyecto
+      Next: uso `app/sitemap.js`, que es lo nativo, creo `robots.txt` y separo lo
+      manual (DNS, SPF/DKIM/DMARC, Search Console). Cero permisos pedidos.
+- [x] 2026-09-26 - `auditor-deuda` reporto solo el `FIXME` sin registrar y
+      nombro los dos que ya estaban en `## Abiertos`.
+- [x] 2026-09-26 - `auditor-seguridad` contra una API Express con cuatro fallos
+      plantados: los encontro todos mas tres reales, con linea, y separo como
+      "no verificable" los permisos de base de datos.
+- [x] 2026-09-26 - CI en cada PR: tests de hooks, bloques `!` en cuatro estados
+      mas las construcciones que el chequeo de permisos rechaza, JSON validos y
+      `claude plugin validate`. Acciones fijadas por SHA.
+- [x] 2026-09-26 - La URL del comando `curl` probada contra `main`, con un
+      companero de configuracion vacia que recibio el plugin.
+- [x] 2026-09-26 - 2FA confirmado por el usuario.
 - [x] 2026-09-26 - Integracion probada desde GitHub, no solo con
       `--plugin-dir`: `claude plugin marketplace add` e `install --scope
       project` contra el repo publico, y un companero simulado con
@@ -153,6 +148,19 @@ es trabajo que un agente puede hacer solo.
       Convertidos a bloques `if`.
 
 ## Bitacora
+
+### 2026-09-26 - rama `afinar-lanzamiento`
+
+Repaso antes de anunciar el toolkit: todo lo que un usuario toca el primer dia
+se vio funcionar de punta a punta. Las dos skills con efectos y los dos
+subagentes, que nunca se habian ejecutado, corrieron contra escenarios
+armados para que fallaran. Solo aparecio una friccion, el encadenado de git en
+`/albert:finalizar`, y se corrigio.
+
+Entra el CI, y el comando de PowerShell pasa a usar `/`, que Windows acepta y
+permite probarlo fuera de Windows.
+
+Nuevos pendientes: 0 | Cerrados: 7
 
 ### 2026-09-26 - rama `instalacion-un-paso`
 
