@@ -53,6 +53,7 @@ Si algo tiene que pasar sin excepciones, no lo pidas en un prompt: ponlo aqui.
 |---|---|---|
 | [`guard-git-destructivo.js`](../plugin/hooks/guard-git-destructivo.js) | `PreToolUse` / `Bash` | Bloquea `push --force`, `reset --hard`, `clean -f` y `branch -D`. Deja pasar `--force-with-lease`, `clean -n` y `branch -d`. |
 | [`guard-secretos.js`](../plugin/hooks/guard-secretos.js) | `PreToolUse` / `Bash` | Impide stagear o commitear `.env`, `*.pem`, `id_rsa`, `credentials.json`, y bloquea comandos con un token literal dentro. Deja pasar `.env.example`. |
+| [`reglas-base.js`](../plugin/hooks/reglas-base.js) | `SessionStart` y `SubagentStart` | Inyecta `plugin/reglas-base.md` en cada sesion y en cada subagente. Es como llegan las reglas base a los repos integrados, sin copiarlas a su `CLAUDE.md`. |
 
 Los dos fallan abierto: si el JSON no parsea, dejan pasar. Y los dos comparten
 pruebas, donde buena parte de los casos comprueban lo que **no** deben

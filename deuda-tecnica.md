@@ -14,12 +14,6 @@ es trabajo que un agente puede hacer solo.
       `--plugin-dir`), pero ninguna se ha visto terminar su procedimiento
       entero: el merge y push de `finalizar` ni los archivos que genera
       `lanzar-dominio`. - `plugin/skills/`
-- [ ] [M] El plugin nunca se ha instalado desde GitHub, solo cargado con
-      `--plugin-dir`. Falta, tras el push a `main`: en un repo destino real,
-      `/plugin marketplace add Kevin-ToJoin/Albert-Efficient-Init`, instalar con
-      alcance de proyecto, `/albert:iniciar`, commitear, y que **otra persona**
-      clone el repo y reciba el plugin al aceptar la confianza de la carpeta.
-      Es la promesa central del toolkit y esta sin probar. - `README.md`
 - [ ] [M] Migrar la maquina Windows del modelo de junction. Ahi siguen
       `~/.claude/skills` y `~/.claude/agents` apuntando a carpetas que ya no
       existen, y `~/.claude/settings.json` registra los guards con rutas a
@@ -35,15 +29,16 @@ es trabajo que un agente puede hacer solo.
       cuenta controla `main`, y `main` se ejecuta en todos los repos
       integrados. No se pudo verificar desde aqui: el token no tiene permiso
       para leerlo.
-- [ ] [A] `"autoUpdate": true` en el `.claude/settings.json` del repo destino
-      esta documentado para cualquier archivo de settings, pero no se ha visto
-      actualizar nada: hace falta un push, abrir sesion en un repo integrado y
-      ver `Plugin updated`. Sin eso, el fallback es
-      `/plugin marketplace update albert-efficient-init`. - `plugin/skills/iniciar/SKILL.md`
-- [ ] [A] `/albert:iniciar` no puede escribir `.claude/settings.json` en una
-      sesion no interactiva: Claude Code protege `.claude/` y lo deniega aun con
-      `acceptEdits`. En interactiva pide confirmacion, que es lo correcto, pero
-      no se ha probado ese camino. - `plugin/skills/iniciar/SKILL.md`
+- [ ] [A] `"autoUpdate": true` no se ha visto actualizar nada: hace falta un
+      merge, abrir sesion en un repo integrado y ver `Plugin updated`. Sin
+      eso, el fallback es `/plugin marketplace update albert-efficient-init`.
+      - `instalar/settings.json`
+- [ ] [M] El comando de una linea para Windows (PowerShell 5.1) no se ha
+      ejecutado: en la Mac no hay PowerShell. Probarlo en la maquina Windows,
+      en un repo con y sin `.claude/settings.json`. - `docs/instalar.md`
+- [ ] [A] La URL del comando `curl` apunta a `main`, asi que solo existe desde
+      el merge de `instalar/settings.json`. Tras el merge, correrlo una vez
+      contra la URL real. - `docs/instalar.md`
 - [ ] [A] `auditor-deuda` nunca se ha ejecutado. Se escribio contra la
       referencia de subagentes pero no se ha invocado ni una vez, asi que no se
       sabe si el reporte sale en el formato pedido ni si el cruce contra
@@ -82,6 +77,14 @@ es trabajo que un agente puede hacer solo.
 
 ## Cerrados
 
+- [x] 2026-09-26 - Integracion probada desde GitHub, no solo con
+      `--plugin-dir`: `claude plugin marketplace add` e `install --scope
+      project` contra el repo publico, y un companero simulado con
+      configuracion vacia que recibio las 6 skills y los 2 agentes solo por
+      clonar el repo y confiar en la carpeta.
+- [x] 2026-09-26 - Las reglas base llegan inyectadas: en una sesion sin
+      ningun `CLAUDE.md`, Claude y un subagente `general-purpose` citaron una
+      regla de `reglas-base.md` e identificaron el hook que la trajo.
 - [x] 2026-09-26 - Las tres skills con bloque `!` fallaban como slash command
       real, aunque su bloque daba `EXIT=0` en bash en los cuatro estados.
       Claude Code pasa el bloque por su chequeo de permisos y rechazaba los
@@ -150,6 +153,26 @@ es trabajo que un agente puede hacer solo.
       Convertidos a bloques `if`.
 
 ## Bitacora
+
+### 2026-09-26 - rama `instalacion-un-paso`
+
+Integrar el toolkit pasa de tres comandos, un panel para elegir alcance, un
+comando que se podia olvidar y dos archivos, a **commitear un archivo**:
+`instalar/settings.json`, que se descarga con una linea.
+
+Lo hizo posible lo que mostro la prueba del companero: con el marketplace
+declarado en `.claude/settings.json`, el plugin carga solo al confiar en la
+carpeta. Instalar desde el panel sobraba. Lo que quedaba era el `CLAUDE.md`, y
+se resolvio sacando las reglas base de el: un hook `SessionStart` las inyecta
+en cada sesion y `SubagentStart` en cada subagente. Ademas de quitar el paso,
+arregla lo que la version anterior no podia: las reglas copiadas no recibian
+ninguna mejora, y ahora se actualizan con el plugin.
+
+`/albert:iniciar` queda opcional: completa el `settings.json` si se instalo
+por el panel, crea un `CLAUDE.md` solo con lo del proyecto, y ofrece quitar
+las reglas que copio la version anterior.
+
+Nuevos pendientes: 2 | Cerrados: 2
 
 ### 2026-09-26 - rama `main` (auditoria antes de hacer publico el repo)
 

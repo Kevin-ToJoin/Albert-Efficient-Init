@@ -5,7 +5,7 @@ description: Reglas para analisis de datos, research y reporting - hallazgo prim
 
 # Perfil de analisis
 
-Se aplica encima de las reglas base del `CLAUDE.md` de la raiz.
+Se aplica encima de las reglas base que inyecta el plugin albert.
 
 ## Salida
 

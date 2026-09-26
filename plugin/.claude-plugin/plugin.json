@@ -1,6 +1,6 @@
 {
   "name": "albert",
-  "description": "Skills, subagentes, hooks y MCP de Albert-Efficient-Init. /albert:iniciar escribe el CLAUDE.md en el repo destino.",
+  "description": "Skills, subagentes, hooks y MCP de Albert-Efficient-Init. Incluye las reglas base, que inyecta en cada sesion.",
   "author": {
     "name": "Kevin-ToJoin"
   },

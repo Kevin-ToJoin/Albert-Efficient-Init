@@ -1,238 +1,135 @@
-# Guia paso a paso: integrar Albert-Efficient-Init en un repo
+# Guia: integrar Albert-Efficient-Init en un repo
 
 Para quien nunca lo ha hecho. Al terminar, tu repo tiene los comandos
 `/albert:...`, los subagentes, los hooks de seguridad y las reglas base, y
-cualquiera que clone el repo los recibe sin hacer nada.
+cualquiera que lo clone los recibe sin hacer nada.
 
-Hay dos papeles:
-
-- **Quien integra** (una sola vez por repo): pasos 0 a 6.
-- **El resto del equipo**: solo la seccion [Si te sumas a un repo que ya lo
-  tiene](#si-te-sumas-a-un-repo-que-ya-lo-tiene).
+**Es un solo archivo.** Lo creas, lo commiteas, y listo.
 
 ---
 
-## 0. Antes de empezar
+## Antes de empezar
 
-Comprueba estas tres cosas. Casi todos los problemas vienen de aqui.
+En la maquina de cada persona que use el repo:
 
-**1. Claude Code instalado y actualizado.**
+| Necesitas | Para que | Comprobarlo |
+|---|---|---|
+| [Claude Code](https://code.claude.com/docs/en/setup) | Todo | `claude --version` |
+| git | Claude Code descarga el toolkit con git | `git --version` |
+| [Node](https://nodejs.org) | Los hooks de seguridad y las reglas base | `node --version` |
 
-```bash
-claude --version
-claude update
-```
+No hace falta cuenta ni credenciales de GitHub: el toolkit es publico.
 
-**2. Node instalado.** Los hooks son scripts de Node. Sin Node, los comandos
-funcionan pero los guards de seguridad no.
-
-```bash
-node --version
-```
-
-Si no sale un numero, instalalo desde [nodejs.org](https://nodejs.org).
-
-**3. Git instalado.** Claude Code descarga el toolkit con `git`. El repo
-del toolkit es publico, asi que no hace falta cuenta ni credenciales de GitHub.
-Para comprobar que llegas a el:
-
-```bash
-git ls-remote https://github.com/Kevin-ToJoin/Albert-Efficient-Init.git
-```
-
-Tiene que listar ramas sin pedirte nada.
-
-> Si usas una llave SSH con GitHub y te da problemas, fuerza HTTPS con la
-> variable de entorno `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1`.
+> Sin Node, los comandos y los subagentes funcionan igual, pero los guards no
+> protegen y las reglas base no llegan.
 
 ---
 
-## 1. Abre tu repo en Claude Code
+## Integrarlo (una vez por repo)
 
-En una terminal, entra a la **raiz** del repo donde quieres el toolkit (la
-carpeta que tiene `.git`) y arranca Claude Code:
+### 1. Crea el archivo
 
-```bash
-cd ruta/a/tu-repo
-claude
-```
+En una terminal, desde la **raiz** del repo (la carpeta que tiene `.git`):
 
-Si pregunta si confias en la carpeta, di que si.
-
-## 2. Agrega el catalogo
-
-Dentro de Claude Code, escribe:
-
-```text
-/plugin marketplace add Kevin-ToJoin/Albert-Efficient-Init
-```
-
-Tiene que responder `Successfully added marketplace: albert-efficient-init`.
-Si falla, vuelve al punto 3 del paso 0.
-
-## 3. Instala el plugin para todo el repo
-
-```text
-/plugin install albert@albert-efficient-init
-```
-
-Se abre un panel con lo que trae el plugin. Elige:
-
-> **Install for all collaborators on this repository (project scope)**
-
-No elijas "for you": en ese caso solo lo tendrias tu.
-
-Si al final dice `Run /reload-plugins to activate`, escribe `/reload-plugins`.
-
-## 4. Deja el repo configurado
-
-```text
-/albert:iniciar
-```
-
-Este comando te va a pedir permiso para escribir archivos. **Acepta**, sobre
-todo el de `.claude/settings.json`: es el que hace que el equipo reciba el
-toolkit.
-
-Deja listos dos archivos:
-
-| Archivo | Que hace |
-|---|---|
-| `CLAUDE.md` | Las reglas base para Claude. Si ya tenias uno, las agrega al final sin tocar lo tuyo |
-| `.claude/settings.json` | Registra el catalogo y activa el plugin para quien abra el repo |
-
-Si te avisa que `.claude/` o `CLAUDE.md` estan en el `.gitignore`, quita esas
-lineas del `.gitignore`. Si no, esos archivos no se suben y el equipo no recibe
-nada.
-
-## 5. Agrega lo tuyo al CLAUDE.md
-
-Abre `CLAUDE.md`. Debajo de las reglas base, agrega lo especifico de **tu**
-proyecto. Es donde esta el valor real:
-
-```markdown
-## Este proyecto
-
-- Stack: Next.js 15 + Supabase.
-- Levantar: `npm run dev`. Tests: `npm test`.
-- Los commits van en ingles, en imperativo.
-```
-
-Corto y concreto. Agrega una regla cuando te descubras corrigiendo lo mismo dos
-veces.
-
-## 6. Sube los cambios
+**Mac o Linux:**
 
 ```bash
-git add CLAUDE.md .claude/settings.json
+if [ -e .claude/settings.json ]; then echo "Ya existe .claude/settings.json: ve al caso de abajo."; else mkdir -p .claude && curl -fsSL https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json -o .claude/settings.json && echo "Listo."; fi
+```
+
+**Windows (PowerShell):**
+
+```powershell
+if (Test-Path .claude\settings.json) { "Ya existe .claude\settings.json: ve al caso de abajo." } else { New-Item -ItemType Directory -Force .claude | Out-Null; [Net.ServicePointManager]::SecurityProtocol = 'Tls12'; Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json -OutFile .claude\settings.json; "Listo." }
+```
+
+**Si tu repo ya tenia `.claude/settings.json`**, no lo reemplaces: ahi puede
+haber permisos del equipo. Abre el repo con `claude` y pega esto:
+
+> Agrega a .claude/settings.json las claves de
+> https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json
+> sin quitar nada de lo que ya tiene
+
+### 2. Commitea y sube
+
+```bash
+git add .claude/settings.json
 git commit -m "Integrar Albert-Efficient-Init"
 git push
 ```
 
-Listo. Ya esta integrado.
+Si `git add` dice que el archivo esta ignorado, quita `.claude/` del
+`.gitignore`: si no se sube, el equipo no recibe nada.
+
+### 3. Abre el repo en Claude Code
+
+```bash
+claude
+```
+
+Cuando pregunte si confias en la carpeta, di **que si**. Claude Code registra
+el toolkit y lo carga. Ya esta.
 
 ---
 
 ## Comprueba que funciona
 
-En Claude Code, dentro del repo:
-
 1. Escribe `/albert:` y tienen que aparecer `iniciar`, `finalizar`,
    `lanzar-dominio` y los tres `perfil-...`.
-2. Escribe `/plugin` y ve a la pestana **Installed**: tiene que aparecer
-   `albert` con alcance de proyecto.
-3. Prueba un guard. Pidele a Claude: *"ejecuta `git branch -D rama-que-no-existe`"*.
-   Tiene que contestar que un hook lo bloqueo.
+2. Pidele a Claude: *"ejecuta `git branch -D rama-que-no-existe`"*. Tiene que
+   contestar que un hook lo bloqueo.
 
-## Que tienes ahora
+## Opcional: el CLAUDE.md de tu proyecto
 
-| Que | Como se usa |
-|---|---|
-| `/albert:finalizar` | Al terminar de trabajar: registra pendientes en `deuda-tecnica.md`, commitea, mergea a `main` y hace push |
-| `/albert:lanzar-dominio` | Al comprar un dominio o antes de publicar un sitio |
-| `/albert:iniciar` | Volver a correrlo no duplica nada |
-| Perfiles de codigo, analisis y seguridad | Se cargan solos cuando la tarea lo pide |
-| `@agent-albert:auditor-deuda` | *"@agent-albert:auditor-deuda revisa que deuda falta registrar"* |
-| `@agent-albert:auditor-seguridad` | Antes de publicar: audita la app contra nueve puntos basicos |
-| Guards | Siempre activos: bloquean `push --force`, `reset --hard` y commitear `.env` o llaves |
+Las reglas base ya llegan solas. Tu `CLAUDE.md` es para lo que solo aplica a
+**tu** proyecto: stack, comandos, convenciones, trampas. Para empezar con la
+estructura sugerida:
+
+```text
+/albert:iniciar
+```
+
+Crea el `CLAUDE.md` si no existe y revisa que `.claude/settings.json` este
+completo. No commitea: revisa y sube tu.
 
 ---
 
 ## Si te sumas a un repo que ya lo tiene
 
-1. Haz el **paso 0** completo (Claude Code, Node y git).
-2. Clona el repo y abrelo con `claude`.
-3. Cuando pregunte si confias en la carpeta, di **que si**.
+1. Revisa la tabla de *Antes de empezar*.
+2. Clona el repo, abrelo con `claude` y acepta la confianza de la carpeta.
 
-Nada mas: Claude Code registra el catalogo y carga el plugin solo. Comprueba
-con `/albert:`.
-
-Si no aparece, escribe `/plugin` y mira la pestana **Errors**. Si dice que el
-plugin esta habilitado pero no instalado, correlo una vez:
-
-```text
-/plugin install albert@albert-efficient-init
-```
-
-y elige otra vez alcance de proyecto.
+Nada mas.
 
 ---
+
+## Que tienes ahora
+
+| Que | Como se usa |
+|---|---|
+| Reglas base | Siempre activas. Estan en [plugin/reglas-base.md](../plugin/reglas-base.md) |
+| Perfiles de codigo, analisis y seguridad | Se cargan solos cuando la tarea lo pide |
+| Guards | Siempre activos: bloquean `push --force`, `reset --hard` y commitear `.env` o llaves |
+| `/albert:finalizar` | Al terminar de trabajar: registra pendientes, commitea, mergea y hace push |
+| `/albert:lanzar-dominio` | Al comprar un dominio o antes de publicar un sitio |
+| `/albert:iniciar` | Opcional: crea tu `CLAUDE.md` y revisa la integracion |
+| `@agent-albert:auditor-deuda` | *"@agent-albert:auditor-deuda revisa que deuda falta registrar"* |
+| `@agent-albert:auditor-seguridad` | Antes de publicar: audita la app contra nueve puntos basicos |
 
 ## Actualizaciones
 
-Son automaticas: al abrir una sesion, Claude Code busca cambios en segundo
-plano y **la siguiente** sesion ya usa la version nueva. Si ves
-`Plugin updated ... Run /reload-plugins to apply`, puedes escribir
-`/reload-plugins` para no esperar.
+Automaticas. Al abrir una sesion, Claude Code busca cambios en segundo plano y
+**la siguiente** sesion ya usa la version nueva. Si ves
+`Plugin updated ... Run /reload-plugins to apply`, escribe `/reload-plugins`
+para no esperar.
 
-Para forzarla en el momento:
-
-```text
-/plugin marketplace update albert-efficient-init
-```
+Para forzarla: `/plugin marketplace update albert-efficient-init`.
 
 ## Quitarlo
 
-```text
-/plugin uninstall albert@albert-efficient-init
-```
-
-Te pregunta si quieres desactivarlo solo para ti (`y`) o quitarlo para todo el
-equipo (`u`). Si lo quitas para todos, borra tambien, si quieres, la seccion
-`# Reglas base` del `CLAUDE.md`, y commitea.
-
----
-
-## Plan B: sin usar comandos dentro de Claude Code
-
-Por ejemplo, para prepararlo desde un script. Desde la raiz de tu repo, en la
-terminal:
-
-```bash
-claude plugin marketplace add Kevin-ToJoin/Albert-Efficient-Init --scope project
-claude plugin install albert@albert-efficient-init --scope project
-```
-
-Eso deja `.claude/settings.json` listo. Luego abre `claude` y corre
-`/albert:iniciar` para el `CLAUDE.md`, o crea el `.claude/settings.json` a mano
-con esto:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "albert-efficient-init": {
-      "source": { "source": "github", "repo": "Kevin-ToJoin/Albert-Efficient-Init" },
-      "autoUpdate": true
-    }
-  },
-  "enabledPlugins": {
-    "albert@albert-efficient-init": true
-  }
-}
-```
-
-Si el archivo ya existia, **no lo reemplaces**: agrega solo esas dos claves,
-porque ahi puede haber permisos del equipo.
+- **Para todo el equipo:** borra las claves `albert-efficient-init` y
+  `albert@albert-efficient-init` de `.claude/settings.json` y commitea.
+- **Solo para ti:** `/plugin`, pestana **Installed**, desactiva `albert`.
 
 ---
 
@@ -240,9 +137,9 @@ porque ahi puede haber permisos del equipo.
 
 | Ves esto | Que pasa | Que hacer |
 |---|---|---|
-| Falla `marketplace add` o dice que no encuentra el repo | Sin red, o git no instalado | Paso 0, punto 3 |
-| `/albert:` no muestra nada | El plugin no cargo | `/plugin`, pestana **Errors** |
-| A un companero no le aparece | No acepto la confianza de la carpeta | Que haga la seccion *Si te sumas...* |
-| El equipo no recibe nada | `.claude/settings.json` no se subio | Revisa el `.gitignore` y haz `git push` |
-| Aviso de hook con `node` en cada comando | Node no esta instalado | Instala Node |
+| `/albert:` no muestra nada | No aceptaste la confianza de la carpeta, o el plugin no cargo | Reabre `claude` y acepta; si sigue, `/plugin`, pestana **Errors** |
+| A un companero no le aparece | Su copia no tiene `.claude/settings.json` | Que haga `git pull`; revisa que el archivo se subio |
+| El equipo no recibe nada | `.claude/` esta en el `.gitignore` | Quitalo del `.gitignore` y sube el archivo |
+| Aviso de hook con `node` al abrir la sesion o en cada comando | Node no esta instalado | Instala Node |
+| El comando de Windows falla al descargar | PowerShell sin acceso a internet o bloqueado por la red | Crea `.claude/settings.json` a mano con el contenido del [README](../README.md#integrarlo-en-un-repositorio) |
 | No llegan las actualizaciones | El auto-update no corrio | `/plugin marketplace update albert-efficient-init` |

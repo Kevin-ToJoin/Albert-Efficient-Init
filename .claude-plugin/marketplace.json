@@ -1,6 +1,6 @@
 {
   "name": "albert-efficient-init",
-  "description": "Toolkit de Claude Code para integrar en cualquier repositorio: skills, subagentes, hooks, MCP y la plantilla de CLAUDE.md.",
+  "description": "Toolkit de Claude Code para integrar en cualquier repositorio: skills, subagentes, hooks, MCP y reglas base de CLAUDE.md.",
   "owner": {
     "name": "Kevin-ToJoin"
   },
@@ -8,7 +8,7 @@
     {
       "name": "albert",
       "source": "./plugin",
-      "description": "Skills, subagentes, hooks y MCP de Albert-Efficient-Init. /albert:iniciar escribe el CLAUDE.md en el repo destino."
+      "description": "Skills, subagentes, hooks y MCP de Albert-Efficient-Init. Incluye las reglas base, que inyecta en cada sesion."
     }
   ]
 }

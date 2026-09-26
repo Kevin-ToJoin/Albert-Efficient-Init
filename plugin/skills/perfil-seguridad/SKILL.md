@@ -5,7 +5,7 @@ description: Principios de seguridad para autenticacion, datos de usuarios, endp
 
 # Perfil de seguridad
 
-Se aplica encima de las reglas base del `CLAUDE.md` de la raiz.
+Se aplica encima de las reglas base que inyecta el plugin albert.
 
 Para cuando el trabajo toca autenticacion, datos de usuarios, endpoints
 publicos, pagos o secretos.

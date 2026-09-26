@@ -11,7 +11,7 @@ copiar: basta con el push a `main`.
 
 | Comando | Para que |
 |---|---|
-| [`/albert:iniciar`](../plugin/skills/iniciar/SKILL.md) | Integra el toolkit en el repo actual: escribe el `CLAUDE.md` con las reglas base y habilita el plugin en `.claude/settings.json` para todo el equipo. |
+| [`/albert:iniciar`](../plugin/skills/iniciar/SKILL.md) | Opcional. Completa `.claude/settings.json` (por ejemplo, el `autoUpdate` que no pone la instalacion por panel) y crea un `CLAUDE.md` para lo propio del proyecto. |
 | [`/albert:finalizar`](../plugin/skills/finalizar/SKILL.md) | Cierra la sesion de trabajo: registra la deuda en `deuda-tecnica.md`, commitea, mergea a la rama base, y reporta solo lo que requiere tu accion manual. |
 | [`/albert:lanzar-dominio`](../plugin/skills/lanzar-dominio/SKILL.md) | Puesta en marcha de un dominio: reparto en subdominios, `robots.txt`, sitemap y alta en Search Console. Genera lo que puede y marca lo que es manual tuyo. |
 | `albert:perfil-codigo`, `albert:perfil-analisis`, `albert:perfil-seguridad` | Reglas por tipo de tarea que Claude carga solo cuando aplican. Ver [claude-md.md](claude-md.md). |

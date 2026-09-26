@@ -168,6 +168,35 @@ afirmar(
   'guard-secretos da motivo y salida'
 );
 
+// ---------------------------------------------------------------------------
+console.log('\n=== reglas-base inyecta las reglas en sesion y subagentes ===');
+function reglas(entrada) {
+  const r = spawnSync(process.execPath, [path.join(__dirname, 'reglas-base.js')], {
+    input: entrada,
+    encoding: 'utf8',
+  });
+  let salida = null;
+  try { salida = JSON.parse(r.stdout).hookSpecificOutput; } catch (e) { /* queda null */ }
+  return { code: r.status, salida: salida };
+}
+for (const [entrada, evento] of [
+  ['{"hook_event_name":"SessionStart","source":"startup"}', 'SessionStart'],
+  ['{"hook_event_name":"SubagentStart","agent_type":"Explore"}', 'SubagentStart'],
+  ['', 'SessionStart'],
+  ['no soy json', 'SessionStart'],
+]) {
+  const { code, salida } = reglas(entrada);
+  afirmar(
+    code === 0 && salida && salida.hookEventName === evento &&
+      /^# Reglas base/.test(salida.additionalContext),
+    'reglas-base responde ' + evento + ' a ' + (entrada ? entrada.slice(0, 38) : '(vacio)')
+  );
+}
+afirmar(
+  reglas('{}').salida.additionalContext.length < 10000,
+  'reglas-base cabe en el limite de 10.000 caracteres'
+);
+
 console.log('');
 console.log(fallos === 0 ? 'TODO OK (0 fallos)' : fallos + ' FALLOS');
 process.exit(fallos === 0 ? 0 : 1);
