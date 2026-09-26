@@ -99,7 +99,7 @@ algo que deberia ser un agente o un hook.
 
 ## Lo que no es obvio
 
-- **Un push a `main` es un release.** El plugin no declara `version` a
+- **Un merge a `main` es un release.** El plugin no declara `version` a
   proposito: asi los repos destino siguen los commits. No agregues `version` a
   `plugin.json` ni al `marketplace.json` salvo que se decida versionar, porque
   desde ese momento un commit sin subir la version no le llega a nadie.
@@ -186,7 +186,8 @@ aqui puede asumir un solo sistema.
 - La maquina principal es **Windows con PowerShell 5.1 Desktop**, sin `pwsh` 7.
   Si escribes PowerShell para algo puntual, recuerda que ahi no hay `&&` como
   encadenador, ni ternarios, ni `??`, y que `$HOME` es de solo lectura.
-- **Sin `gh` CLI.** No hay flujo de PRs desde aqui: commit local y push.
+- **`gh` CLI:** en la Mac si esta, autenticado; en la maquina Windows no.
+  Sin `gh`, el PR se abre desde la web con el enlace que imprime el push.
 - Las rutas reales del usuario llevan espacios. Cita siempre.
 
 ## Commits y cierre
@@ -194,8 +195,16 @@ aqui puede asumir un solo sistema.
 - Mensajes en espanol, imperativo, una linea de asunto y cuerpo que explique el
   **por que**, no el que. Sin prefijos de herramienta.
 - **Sin linea `Co-Authored-By`.** El historial no la usa; no la agregues.
-- Nunca hagas push sin confirmarlo antes con el usuario. Aqui un push a `main`
-  le llega a todos los repos que integran el toolkit.
+- **`main` esta protegida:** no admite push directo ni force push, ni siquiera
+  de administradores. Todo cambio va por rama y pull request:
+  `git switch -c <rama>`, commit, `git push -u origin <rama>`,
+  `gh pr create --fill`, `gh pr merge --merge`. El PR no exige aprobacion: el
+  unico mantenedor no puede aprobarse a si mismo.
+- Nunca hagas push ni mergees un PR sin confirmarlo antes con el usuario. Un
+  merge a `main` le llega a todos los repos que integran el toolkit.
+- El repo es **publico**. Nada de secretos, correos personales, rutas de la
+  maquina ni nombres de otros repos privados en archivos, commits ni PRs. Los
+  commits van con el correo `noreply` de GitHub.
 - `deuda-tecnica.md` lo mantiene `/albert:finalizar`. Lo que quede a medias,
   sin verificar o decidido a medias va ahi, con `[M]` si requiere accion manual
   del usuario o `[A]` si un agente puede cerrarlo solo. No lo repitas en el chat
