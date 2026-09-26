@@ -30,12 +30,23 @@ jobs:
       - name: Tests de los hooks
         run: node plugin/hooks/guards.test.js
 
+      - name: Tests del instalador
+        run: node instalar/instalar.test.js
+
+      - name: Instalador en ASCII puro
+        # PowerShell 5.1 pasa el texto por pipe a node en ASCII: una tilde en
+        # un comentario corromperia el script en Windows.
+        run: |
+          if LC_ALL=C grep -n '[^ -~]' instalar/instalar.js; then
+            echo "instalar.js tiene caracteres no ASCII"; exit 1
+          fi
+
       - name: Bloques ! de las skills
         run: bash .github/probar-bloques.sh
 
       - name: JSON validos
         run: |
-          for f in .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json plugin/hooks/hooks.json plugin/.mcp.json instalar/settings.json; do
+          for f in .claude-plugin/marketplace.json plugin/.claude-plugin/plugin.json plugin/hooks/hooks.json plugin/.mcp.json; do
             node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" && echo "ok  $f"
           done
 

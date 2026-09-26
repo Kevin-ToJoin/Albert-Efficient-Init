@@ -17,26 +17,34 @@ se copia a mano y no hay instalador.
 
 ## Integrarlo en un repositorio
 
-**Un archivo.** Desde la raíz del repo, en la terminal:
+**Un comando**, desde la raíz del repo. En Mac o Linux:
 
 ```bash
-mkdir -p .claude && curl -fsSL https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json -o .claude/settings.json
+curl -fsSL https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/instalar.js | node -
 ```
 
-Commitéalo y súbelo. Ya está: quien abra el repo en Claude Code y acepte la
-confianza de la carpeta recibe todo, tú incluido. No hay que instalar nada, ni
-elegir alcances, ni correr comandos dentro de Claude Code.
+En Windows (PowerShell):
 
-> **¿Tu repo ya tiene `.claude/settings.json`?** No lo reemplaces. Ábrelo en
-> Claude Code y pega: *"Agrega a .claude/settings.json las claves de
-> https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json
-> sin quitar nada de lo que ya tiene"*.
+```powershell
+irm https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/instalar.js | node -
+```
 
-Windows, Mac y Linux, requisitos, qué ve el resto del equipo y problemas
-frecuentes: **[docs/instalar.md](docs/instalar.md)**.
+Después abre el repo con `claude` y acepta la confianza de la carpeta. Ya está.
 
-El archivo registra este repo como catálogo, habilita el plugin y activa la
-actualización automática:
+**No deja nada que commitear.** Agrega el toolkit a `.claude/settings.local.json`,
+el archivo de configuración personal de Claude Code, y lo excluye de git en
+`.git/info/exclude`, que es local. No toca el `.gitignore` ni ningún archivo
+del repo, y si ya tenías ese archivo con permisos, los conserva. Cada persona
+que lo quiera corre el comando en su máquina.
+
+**Para que lo reciba todo el equipo sin correr nada**, agrega `--equipo` al
+final (`... | node - --equipo`). Escribe `.claude/settings.json`, que se
+commitea: quien clone el repo lo recibe al confiar en la carpeta.
+
+Requisitos, qué ve cada uno y problemas frecuentes:
+**[docs/instalar.md](docs/instalar.md)**.
+
+Las claves que agrega, por si prefieres escribirlas a mano:
 
 ```json
 {
@@ -68,8 +76,8 @@ Para forzarlo en el momento: `/plugin marketplace update albert-efficient-init`.
 
 ### Quitarlo
 
-Para todo el equipo: borra las dos claves de `.claude/settings.json` y
-commitea. Solo para ti: `/plugin`, pestaña **Installed**, desactívalo.
+Borra las dos claves del archivo donde estén: `.claude/settings.local.json`
+(personal) o `.claude/settings.json` (equipo, y commitea).
 
 ## Las skills
 
@@ -77,7 +85,7 @@ Todas llevan el prefijo del plugin: `/albert:<nombre>`.
 
 ### `/albert:iniciar`
 
-Opcional. Revisa la integración: completa `.claude/settings.json` si le falta
+Opcional. Revisa la integración: completa las claves del toolkit si les falta
 algo (por ejemplo, el `autoUpdate`, si se instaló desde el panel de `/plugin`)
 y crea un `CLAUDE.md` con la estructura sugerida para lo propio del proyecto.
 Si tu `CLAUDE.md` tiene reglas base copiadas por una versión anterior, te
@@ -179,7 +187,7 @@ plugin/                           lo que le llega a los repos que lo integran
   agents/                         auditor-deuda, auditor-seguridad
   hooks/                          hooks.json, guards, reglas-base.js y pruebas
   .mcp.json
-instalar/settings.json            el único archivo que necesita un repo destino
+instalar/instalar.js              el comando de integración, con sus pruebas
 docs/                             cómo escribir cada pieza y qué va en cada una
 CLAUDE.md                         cómo trabajar en ESTE repo
 deuda-tecnica.md                  pendientes, mantenido por /albert:finalizar
