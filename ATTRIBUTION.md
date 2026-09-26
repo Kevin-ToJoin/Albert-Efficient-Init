@@ -14,8 +14,7 @@ License: MIT
 
 ## What is original here
 
-- Local-only install model: files live in a gitignored `Efficiency/` folder so collaborators are not affected.
-- Idempotent `install.sh` that wires up `.gitignore` and the root entry-point.
+- Local-only model: files live in a gitignored `Efficiency/` folder so collaborators are not affected.
 - All rule wording is rewritten. No paragraph or rule was copied verbatim.
 - Removed: marketing claims, benchmark tables, agents profile, versioned configuration sets, decorative content.
 - Reframed: rules are stated as actions rather than prohibitions wherever possible.
