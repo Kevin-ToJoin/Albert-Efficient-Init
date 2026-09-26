@@ -14,7 +14,7 @@ Hay dos papeles:
 
 ## 0. Antes de empezar
 
-Comprueba estas cuatro cosas. Casi todos los problemas vienen de aqui.
+Comprueba estas tres cosas. Casi todos los problemas vienen de aqui.
 
 **1. Claude Code instalado y actualizado.**
 
@@ -32,28 +32,15 @@ node --version
 
 Si no sale un numero, instalalo desde [nodejs.org](https://nodejs.org).
 
-**3. Acceso al repo del toolkit.** `Kevin-ToJoin/Albert-Efficient-Init` es
-**privado**. Pidele a Kevin-ToJoin que te agregue como colaborador en GitHub.
-Para comprobarlo, abre
-<https://github.com/Kevin-ToJoin/Albert-Efficient-Init> con tu cuenta: si ves
-el codigo, tienes acceso.
-
-**4. Git sabe entrar a GitHub sin preguntarte.** Claude Code descarga el
-toolkit con `git`, pero **no puede escribir tu contrasena**. Si git te la
-pediria, simplemente falla. La forma mas facil de dejarlo listo:
-
-```bash
-gh auth login        # elige GitHub.com y HTTPS, y sigue los pasos
-gh auth setup-git
-```
-
-Si no tienes `gh`, instalalo desde [cli.github.com](https://cli.github.com).
-Para comprobar que quedo bien, esto tiene que listar ramas **sin pedirte
-nada**:
+**3. Git instalado.** Claude Code descarga el toolkit con `git`. El repo
+del toolkit es publico, asi que no hace falta cuenta ni credenciales de GitHub.
+Para comprobar que llegas a el:
 
 ```bash
 git ls-remote https://github.com/Kevin-ToJoin/Albert-Efficient-Init.git
 ```
+
+Tiene que listar ramas sin pedirte nada.
 
 > Si usas una llave SSH con GitHub y te da problemas, fuerza HTTPS con la
 > variable de entorno `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1`.
@@ -81,7 +68,7 @@ Dentro de Claude Code, escribe:
 ```
 
 Tiene que responder `Successfully added marketplace: albert-efficient-init`.
-Si falla, vuelve al punto 3 o 4 del paso 0.
+Si falla, vuelve al punto 3 del paso 0.
 
 ## 3. Instala el plugin para todo el repo
 
@@ -173,7 +160,7 @@ En Claude Code, dentro del repo:
 
 ## Si te sumas a un repo que ya lo tiene
 
-1. Haz el **paso 0** completo (Node, acceso al repo del toolkit, `gh auth`).
+1. Haz el **paso 0** completo (Claude Code, Node y git).
 2. Clona el repo y abrelo con `claude`.
 3. Cuando pregunte si confias en la carpeta, di **que si**.
 
@@ -253,9 +240,9 @@ porque ahi puede haber permisos del equipo.
 
 | Ves esto | Que pasa | Que hacer |
 |---|---|---|
-| Falla `marketplace add` o dice que no encuentra el repo | Sin acceso al repo privado, o git no tiene credenciales guardadas | Paso 0, puntos 3 y 4 |
+| Falla `marketplace add` o dice que no encuentra el repo | Sin red, o git no instalado | Paso 0, punto 3 |
 | `/albert:` no muestra nada | El plugin no cargo | `/plugin`, pestana **Errors** |
-| A un companero no le aparece | No acepto la confianza de la carpeta, o no tiene acceso al repo del toolkit | Que haga la seccion *Si te sumas...* |
+| A un companero no le aparece | No acepto la confianza de la carpeta | Que haga la seccion *Si te sumas...* |
 | El equipo no recibe nada | `.claude/settings.json` no se subio | Revisa el `.gitignore` y haz `git push` |
 | Aviso de hook con `node` en cada comando | Node no esta instalado | Instala Node |
 | No llegan las actualizaciones | El auto-update no corrio | `/plugin marketplace update albert-efficient-init` |

@@ -21,10 +21,6 @@ se copia a mano y no hay instalador.
 > [docs/instalar.md](docs/instalar.md).** Incluye requisitos, qué hace el
 > resto del equipo y problemas frecuentes.
 
-Este repo es **privado**: cada persona necesita acceso de lectura en GitHub y
-credenciales de git guardadas (por ejemplo `gh auth login` + `gh auth setup-git`),
-porque Claude Code clona sin poder pedir contraseña.
-
 Una vez por repo, desde la raíz del repo destino, en una sesión de Claude Code:
 
 ```text

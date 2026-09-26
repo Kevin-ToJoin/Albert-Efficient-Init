@@ -25,7 +25,16 @@ es trabajo que un agente puede hacer solo.
       existen, y `~/.claude/settings.json` registra los guards con rutas a
       `hooks/` que tampoco existen: `node` falla en cada Bash con un error no
       bloqueante y **los guards dejan de proteger**. Quitar
-      las dos junctions y el bloque de hooks, e integrar el plugin.
+      las dos junctions y el bloque de hooks, e integrar el plugin. Y fijar ahi
+      `git config --global user.email 102131063+Kevin-ToJoin@users.noreply.github.com`:
+      de esa maquina salieron los commits con el correo personal.
+- [ ] [M] En GitHub, Settings > Emails: activar "Keep my email addresses
+      private" y "Block command line pushes that expose my email". Es lo que
+      impide que el correo personal vuelva a colarse desde cualquier maquina.
+- [ ] [M] Confirmar que la cuenta `Kevin-ToJoin` tiene 2FA. Quien controle la
+      cuenta controla `main`, y `main` se ejecuta en todos los repos
+      integrados. No se pudo verificar desde aqui: el token no tiene permiso
+      para leerlo.
 - [ ] [A] `"autoUpdate": true` en el `.claude/settings.json` del repo destino
       esta documentado para cualquier archivo de settings, pero no se ha visto
       actualizar nada: hace falta un push, abrir sesion en un repo integrado y
@@ -141,6 +150,27 @@ es trabajo que un agente puede hacer solo.
       Convertidos a bloques `if`.
 
 ## Bitacora
+
+### 2026-09-26 - rama `main` (auditoria antes de hacer publico el repo)
+
+Revision red team / blue team de todo lo que un repo publico expone: los 18
+commits de todas las ramas, incluidos los archivos ya borrados, el PR #1 y la
+configuracion de GitHub. Sin secretos (`gitleaks` limpio y un barrido propio de
+correos, IPs, rutas, tokens y menciones a los otros 16 repos de la cuenta), y
+hooks sin red, sin escritura y sin inyeccion posible.
+
+Lo unico expuesto era el correo personal en 12 commits. Reescribir y hacer
+force push no bastaba: el PR #1 fija sus commits para siempre y GitHub sigue
+sirviendo los SHAs viejos. Se reescribio con `git filter-repo --mailmap` al
+`noreply`, se creo el repo limpio con nombre temporal, se borro el viejo y se
+renombro. Se pierde el PR #1, sin valor. El respaldo completo del historial
+original esta fuera del repo, en `../Albert-Efficient-Init-respaldo-2026-09-26/`.
+
+El riesgo real no es lo que se ve sino quien escribe: con `autoUpdate`, un
+commit a `main` se ejecuta en cada maquina de cada repo integrado. De ahi la
+proteccion de `main` y `SECURITY.md`.
+
+Nuevos pendientes: 2 | Cerrados: 0
 
 ### 2026-09-26 - rama `toolkit-plugin` (alcance definitivo)
 
