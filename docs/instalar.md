@@ -1,10 +1,9 @@
 # Guia: integrar Albert-Efficient-Init en un repo
 
 Para quien nunca lo ha hecho. Al terminar, tu repo tiene los comandos
-`/albert:...`, los subagentes, los hooks de seguridad y las reglas base, y
-cualquiera que lo clone los recibe sin hacer nada.
+`/albert:...`, los subagentes, los hooks de seguridad y las reglas base.
 
-**Es un solo archivo.** Lo creas, lo commiteas, y listo.
+**Es un solo comando, y no deja nada que commitear.**
 
 ---
 
@@ -16,59 +15,72 @@ En la maquina de cada persona que use el repo:
 |---|---|---|
 | [Claude Code](https://code.claude.com/docs/en/setup) | Todo | `claude --version` |
 | git | Claude Code descarga el toolkit con git | `git --version` |
-| [Node](https://nodejs.org) | Los hooks de seguridad y las reglas base | `node --version` |
+| [Node](https://nodejs.org) | El comando de integracion, los hooks de seguridad y las reglas base | `node --version` |
 
 No hace falta cuenta ni credenciales de GitHub: el toolkit es publico.
 
-> Sin Node, los comandos y los subagentes funcionan igual, pero los guards no
-> protegen y las reglas base no llegan.
+> Si ya integraste con `--equipo` y a un companero le falta Node, los comandos
+> y los subagentes le funcionan igual, pero sin guards ni reglas base.
 
 ---
 
-## Integrarlo (una vez por repo)
+## Integrarlo
 
-### 1. Crea el archivo
+### 1. Corre el comando
 
-En una terminal, desde la **raiz** del repo (la carpeta que tiene `.git`):
+En una terminal, desde la carpeta del repo (sirve cualquier subcarpeta):
 
 **Mac o Linux:**
 
 ```bash
-if [ -e .claude/settings.json ]; then echo "Ya existe .claude/settings.json: ve al caso de abajo."; else mkdir -p .claude && curl -fsSL https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json -o .claude/settings.json && echo "Listo."; fi
+curl -fsSL https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/instalar.js | node -
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-if (Test-Path .claude/settings.json) { "Ya existe .claude/settings.json: ve al caso de abajo." } else { New-Item -ItemType Directory -Force .claude | Out-Null; [Net.ServicePointManager]::SecurityProtocol = 'Tls12'; Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json -OutFile .claude/settings.json; "Listo." }
+irm https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/instalar.js | node -
 ```
 
-**Si tu repo ya tenia `.claude/settings.json`**, no lo reemplaces: ahi puede
-haber permisos del equipo. Abre el repo con `claude` y pega esto:
+Tiene que terminar con:
 
-> Agrega a .claude/settings.json las claves de
-> https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json
-> sin quitar nada de lo que ya tiene
-
-### 2. Commitea y sube
-
-```bash
-git add .claude/settings.json
-git commit -m "Integrar Albert-Efficient-Init"
-git push
+```text
+Listo: .claude/settings.local.json
+Excluido de git en .git/info/exclude: no hay nada que commitear.
+Abre el repo con `claude` y acepta la confianza de la carpeta.
 ```
 
-Si `git add` dice que el archivo esta ignorado, quita `.claude/` del
-`.gitignore`: si no se sube, el equipo no recibe nada.
+Que hizo:
 
-### 3. Abre el repo en Claude Code
+- Agrego el toolkit a `.claude/settings.local.json`, el archivo de
+  configuracion personal de Claude Code. Si ya existia, con permisos que
+  fuiste aprobando, los conserva.
+- Lo excluyo de git en `.git/info/exclude`. Ese archivo es local, no se
+  commitea, asi que **no se toca el `.gitignore` ni nada del repo**:
+  `git status` queda igual que antes.
+
+Correrlo dos veces no duplica nada.
+
+### 2. Abre el repo en Claude Code
 
 ```bash
 claude
 ```
 
-Cuando pregunte si confias en la carpeta, di **que si**. Claude Code registra
-el toolkit y lo carga. Ya esta.
+Cuando pregunte si confias en la carpeta, di **que si**. Ya esta.
+
+### Para todo el equipo de una vez
+
+Lo de arriba es personal: cada persona que lo quiera corre el comando. Si
+prefieres que lo reciba **todo el equipo sin correr nada**, agrega `--equipo`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/instalar.js | node - --equipo
+```
+
+Escribe `.claude/settings.json` en lugar del archivo personal. Ese si se
+commitea y se sube: quien clone el repo recibe el toolkit al abrirlo con
+`claude` y confiar en la carpeta.
 
 ---
 
@@ -89,17 +101,16 @@ estructura sugerida:
 /albert:iniciar
 ```
 
-Crea el `CLAUDE.md` si no existe y revisa que `.claude/settings.json` este
-completo. No commitea: revisa y sube tu.
+Crea el `CLAUDE.md` si no existe y revisa que las claves del toolkit esten
+completas. No commitea: revisa y sube tu.
 
 ---
 
 ## Si te sumas a un repo que ya lo tiene
 
-1. Revisa la tabla de *Antes de empezar*.
-2. Clona el repo, abrelo con `claude` y acepta la confianza de la carpeta.
-
-Nada mas.
+- **Si se integro con `--equipo`**: clona el repo, abrelo con `claude` y acepta
+  la confianza de la carpeta. Nada mas.
+- **Si no**: corre tu el comando del paso 1.
 
 ---
 
@@ -128,9 +139,9 @@ Para forzarla: `/plugin marketplace update albert-efficient-init`.
 
 ## Quitarlo
 
-- **Para todo el equipo:** borra las claves `albert-efficient-init` y
-  `albert@albert-efficient-init` de `.claude/settings.json` y commitea.
-- **Solo para ti:** `/plugin`, pestana **Installed**, desactiva `albert`.
+Borra las claves `albert-efficient-init` y `albert@albert-efficient-init` del
+archivo donde esten: `.claude/settings.local.json` (personal) o
+`.claude/settings.json` (equipo, y commitea el cambio).
 
 ---
 
@@ -139,9 +150,11 @@ Para forzarla: `/plugin marketplace update albert-efficient-init`.
 | Ves esto | Que pasa | Que hacer |
 |---|---|---|
 | `/albert:` no muestra nada | No aceptaste la confianza de la carpeta, o el plugin no cargo | Reabre `claude` y acepta; si sigue, `/plugin`, pestana **Errors** |
-| A un companero no le aparece | Su copia no tiene `.claude/settings.json` | Que haga `git pull`; revisa que el archivo se subio |
-| El equipo no recibe nada | `.claude/` esta en el `.gitignore` | Quitalo del `.gitignore` y sube el archivo |
+| A un companero no le aparece | El modo personal es por persona | Que corra el comando, o integralo con `--equipo` |
+| Con `--equipo`, el equipo no recibe nada | `.claude/` esta en el `.gitignore`, o no se subio | Quitalo del `.gitignore` y sube `.claude/settings.json` |
 | Aviso de hook con `node` al abrir la sesion o en cada comando | Node no esta instalado | Instala Node |
-| El comando de Windows falla al descargar | PowerShell sin acceso a internet o bloqueado por la red | Crea `.claude/settings.json` a mano con el contenido del [README](../README.md#integrarlo-en-un-repositorio) |
+| En Windows, `irm` falla al descargar | PowerShell antiguo sin TLS 1.2, o red bloqueada | Antepon `[Net.ServicePointManager]::SecurityProtocol='Tls12';` al comando, o agrega las claves a mano (estan en el [README](../README.md#integrarlo-en-un-repositorio)) |
+| `No se toco .claude/settings.local.json: no es JSON valido` | El archivo existente esta roto | Corrigelo y vuelve a correr el comando. El instalador nunca pisa un archivo que no entiende |
+| `node` no se reconoce | Node no esta instalado | Instala Node: el toolkit lo necesita de todos modos |
 | No llegan las actualizaciones | El auto-update corre en sesiones interactivas, hasta 10 minutos despues del primer mensaje, y carga en la sesion siguiente | Espera a la proxima sesion, o `/plugin marketplace update albert-efficient-init` |
 | Con `claude -p` (CI, scripts) no aparece el plugin | En modo no interactivo el plugin carga en segundo plano y puede faltar en el primer turno | Define `CLAUDE_CODE_SYNC_PLUGIN_INSTALL=1` para que espere a cargarlo |

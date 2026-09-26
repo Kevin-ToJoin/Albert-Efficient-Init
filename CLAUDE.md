@@ -118,12 +118,18 @@ algo que deberia ser un agente o un hook.
   `SubagentStart`, porque los subagentes no ven el contexto de la sesion). El
   `CLAUDE.md` de la raiz lo importa, asi que editarlo cambia tambien como se
   comporta Claude aqui. Tope del hook: 10.000 caracteres; hay un test.
-- **Instalar es commitear un archivo.** `instalar/settings.json` es lo unico
-  que necesita un repo destino. Si algo nuevo obliga a un segundo paso, esta
-  mal planteado: el objetivo del proyecto es integrarlo sin friccion.
-- **No reintroduzcas un instalador.** El plugin es el mecanismo de
-  distribucion; los scripts, las junctions y el modo global se quitaron a
-  proposito. El motivo esta en la bitacora de `deuda-tecnica.md`.
+- **Integrar es un comando y no deja nada que commitear.** Por defecto
+  escribe `.claude/settings.local.json` y lo excluye en `.git/info/exclude`,
+  sin tocar el `.gitignore` del repo destino; `--equipo` escribe
+  `.claude/settings.json` para commitear. Si algo nuevo obliga a un segundo
+  paso, esta mal planteado: el objetivo del proyecto es integrarlo sin
+  friccion.
+- **`instalar/instalar.js` es el unico script de instalacion, y solo agrega
+  dos claves a un settings.** El plugin es el mecanismo de distribucion; el
+  instalador viejo, con cinco scripts, junctions y modo global, se quito a
+  proposito (motivo en la bitacora de `deuda-tecnica.md`). No le agregues modos
+  ni pasos. Tiene que seguir en ASCII puro, porque PowerShell 5.1 lo pasa a
+  `node` por pipe en ASCII; el CI lo comprueba.
 - **Una skill no es un agente.** Una skill es un procedimiento que se inyecta
   en *esta* conversacion y admite bloques ` ```! `. Un agente corre en su
   propio contexto, no ve nada de la conversacion, y su cuerpo es un system
@@ -136,9 +142,9 @@ algo que deberia ser un agente o un hook.
 
 ## Como se verifica lo que hay aqui
 
-**Cada PR corre el CI** (`.github/workflows/ci.yml`): tests de hooks, bloques
-`!` de las skills (`.github/probar-bloques.sh`), JSON validos y
-`claude plugin validate`. Localmente, lo mismo por partes.
+**Cada PR corre el CI** (`.github/workflows/ci.yml`): tests de hooks, tests
+del instalador (`instalar/instalar.test.js`), bloques `!` de las skills
+(`.github/probar-bloques.sh`), JSON validos y `claude plugin validate`. Localmente, lo mismo por partes.
 
 El plugin y el marketplace se validan con el CLI:
 

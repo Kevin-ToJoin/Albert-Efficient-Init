@@ -9,9 +9,11 @@ es trabajo que un agente puede hacer solo.
 
 ## Abiertos
 
-- [ ] [M] El comando de una linea para Windows funciona en PowerShell 7.6, pero
-      falta PowerShell 5.1, la que trae Windows. Lo unico propio de 5.1 es la
-      linea de TLS. Probarlo en la maquina Windows. - `docs/instalar.md`
+- [ ] [M] El instalador en Windows funciona en PowerShell 7.6 (`irm ... | node -`),
+      pero falta PowerShell 5.1, la que trae Windows. El script es ASCII puro
+      para que el pipe de 5.1 no lo corrompa, y el CI lo vigila; lo que queda
+      por ver es si `irm` necesita TLS 1.2 forzado. Probarlo en la maquina
+      Windows. - `instalar/instalar.js`
 - [ ] [M] Migrar la maquina Windows del modelo de junction. Ahi siguen
       `~/.claude/skills` y `~/.claude/agents` apuntando a carpetas que ya no
       existen, y `~/.claude/settings.json` registra los guards con rutas a
@@ -151,6 +153,28 @@ es trabajo que un agente puede hacer solo.
       Convertidos a bloques `if`.
 
 ## Bitacora
+
+### 2026-09-26 - rama `instalacion-personal`
+
+Cambia el modo por defecto de integrar el toolkit: **personal y sin dejar nada
+que commitear en el repo destino**, a pedido del usuario. El modo equipo sigue
+disponible con `--equipo`.
+
+El comando de `curl` a `settings.json` no servia para esto. El archivo
+personal de Claude Code es `.claude/settings.local.json`, y ese suele existir
+ya con los permisos aprobados: `curl -o` los habria borrado. Ademas nada
+garantiza que este ignorado; en esta Mac lo estaba solo por una regla global
+en `~/.config/git/ignore`. Por eso entra `instalar/instalar.js`: mergea las dos
+claves sin pisar nada y excluye el archivo en `.git/info/exclude`, que es local,
+en vez de tocar el `.gitignore` del repo.
+
+Se verifico que el plugin carga igual declarado desde `settings.local.json`, y
+el flujo entero en una maquina sin configuracion de git ni de Claude Code:
+`git status` queda vacio y el plugin carga. Las pruebas del instalador corren
+con `HOME` vacio, con una contraprueba de que sin el script git si ve el
+archivo.
+
+Nuevos pendientes: 0 | Cerrados: 0
 
 ### 2026-09-26 - rama `afinar-lanzamiento`
 
