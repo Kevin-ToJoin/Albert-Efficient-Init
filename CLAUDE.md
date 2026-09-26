@@ -40,7 +40,7 @@ archivo, asi que no gasta contexto. Las notas para humanos van aqui.
 # Albert-Efficient-Init
 
 Toolkit de Claude Code que se integra en **cualquier otro repositorio** como
-plugin: skills, subagentes, hooks, MCP y la plantilla de `CLAUDE.md`. Ese es el
+plugin: skills, subagentes, hooks, MCP y las reglas base de `CLAUDE.md`. Ese es el
 alcance entero del proyecto. No es un libro de consulta ni una configuracion
 personal de `~/.claude`: todo lo que se agregue aqui tiene que poder viajar a un
 repo ajeno y servirle a su equipo.
@@ -55,7 +55,7 @@ La documentacion de este repo esta en espanol. Mantenla asi.
 
 Las que este repo distribuye a otros proyectos, aplicadas aqui tambien:
 
-@plugin/skills/iniciar/CLAUDE-plantilla.md
+@plugin/reglas-base.md
 
 ## Antes de afirmar como funciona Claude Code
 
@@ -91,7 +91,7 @@ Dentro de `plugin/`, cada pieza por su via:
 | Subagentes | `plugin/agents/<n>.md` | Solos, como `@agent-albert:<n>` |
 | Hooks | `plugin/hooks/hooks.json` | Solos. Los scripts se referencian con `${CLAUDE_PLUGIN_ROOT}` |
 | MCP | `plugin/.mcp.json` | Solos. Hoy vacio a proposito |
-| CLAUDE.md | `plugin/skills/iniciar/CLAUDE-plantilla.md` | **No llega solo.** Lo escribe `/albert:iniciar` en el repo destino |
+| Reglas base | `plugin/reglas-base.md` | Solas: `hooks/reglas-base.js` las inyecta en cada sesion y cada subagente. **No** se copian al `CLAUDE.md` del repo destino |
 
 Cada pieza tiene su guia en `docs/` con que merece guardarse ahi y que no. Si
 vas a crear algo nuevo, leela antes: la confusion tipica es meter en `skills/`
@@ -113,11 +113,14 @@ algo que deberia ser un agente o un hook.
   referencia con `${CLAUDE_PLUGIN_ROOT}`.
 - **Nada de `CLAUDE.md` ni `README.md` dentro de `plugin/`.** El primero no se
   carga y el validador lo marca; las guias de autor van en `docs/`.
-- **`CLAUDE-plantilla.md` se llama asi a proposito.** Si se llamara
-  `CLAUDE.md`, Claude Code lo cargaria al trabajar dentro de su carpeta. El
+- **Las reglas base no van en un `CLAUDE.md`.** Un plugin no puede aportar uno,
+  asi que `plugin/reglas-base.md` llega por un hook `SessionStart` (y
+  `SubagentStart`, porque los subagentes no ven el contexto de la sesion). El
   `CLAUDE.md` de la raiz lo importa, asi que editarlo cambia tambien como se
-  comporta Claude aqui. Tiene que seguir siendo autocontenido: en el repo
-  destino va solo.
+  comporta Claude aqui. Tope del hook: 10.000 caracteres; hay un test.
+- **Instalar es commitear un archivo.** `instalar/settings.json` es lo unico
+  que necesita un repo destino. Si algo nuevo obliga a un segundo paso, esta
+  mal planteado: el objetivo del proyecto es integrarlo sin friccion.
 - **No reintroduzcas un instalador.** El plugin es el mecanismo de
   distribucion; los scripts, las junctions y el modo global se quitaron a
   proposito. El motivo esta en la bitacora de `deuda-tecnica.md`.
@@ -127,8 +130,9 @@ algo que deberia ser un agente o un hook.
   prompt que **no ejecuta nada**. En un plugin, los agentes ignoran
   `hooks`, `mcpServers` y `permissionMode` del frontmatter.
 - **Cada subagente carga los `CLAUDE.md` completos** salvo que lleve
-  `omitClaudeMd: true`. La plantilla entra en el contexto de cada agente en
-  cada repo destino, asi que mantenerla corta importa mas de lo que parece.
+  `omitClaudeMd: true`, y ademas reciben las reglas base por `SubagentStart`.
+  Cada linea de `reglas-base.md` se paga en cada sesion y cada subagente de
+  cada repo destino.
 
 ## Como se verifica lo que hay aqui
 

@@ -1,0 +1,11 @@
+{
+  "extraKnownMarketplaces": {
+    "albert-efficient-init": {
+      "source": { "source": "github", "repo": "Kevin-ToJoin/Albert-Efficient-Init" },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "albert@albert-efficient-init": true
+  }
+}

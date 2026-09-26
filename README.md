@@ -9,7 +9,7 @@ todo el equipo. Trae cinco piezas:
 | **Subagentes** | Auditorías que corren en su propio contexto | `plugin/agents/` |
 | **Hooks** | Guards deterministas que bloquean lo peligroso | `plugin/hooks/` |
 | **MCP** | Conexiones a sistemas externos | `plugin/.mcp.json` |
-| **CLAUDE.md** | Reglas base que `/albert:iniciar` escribe en el repo | `plugin/skills/iniciar/` |
+| **Reglas base** | Lo que antes iba en el `CLAUDE.md`: llegan solas en cada sesión | `plugin/reglas-base.md` |
 
 Se distribuye como **plugin de Claude Code**. Este repo es a la vez el
 marketplace (`.claude-plugin/marketplace.json`) y el plugin (`plugin/`). Nada
@@ -17,26 +17,26 @@ se copia a mano y no hay instalador.
 
 ## Integrarlo en un repositorio
 
-> **Guía paso a paso para quien nunca lo ha hecho:
-> [docs/instalar.md](docs/instalar.md).** Incluye requisitos, qué hace el
-> resto del equipo y problemas frecuentes.
+**Un archivo.** Desde la raíz del repo, en la terminal:
 
-Una vez por repo, desde la raíz del repo destino, en una sesión de Claude Code:
-
-```text
-/plugin marketplace add Kevin-ToJoin/Albert-Efficient-Init
-/plugin install albert@albert-efficient-init
-/albert:iniciar
+```bash
+mkdir -p .claude && curl -fsSL https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json -o .claude/settings.json
 ```
 
-Al instalar, elige **Install for all collaborators on this repository**
-(alcance de proyecto). `/albert:iniciar` deja dos archivos listos para
-commitear:
+Commitéalo y súbelo. Ya está: quien abra el repo en Claude Code y acepte la
+confianza de la carpeta recibe todo, tú incluido. No hay que instalar nada, ni
+elegir alcances, ni correr comandos dentro de Claude Code.
 
-- **`CLAUDE.md`** con las reglas base. Si ya tenías uno, las agrega al final
-  sin tocar lo tuyo.
-- **`.claude/settings.json`** con el marketplace y el plugin habilitados. Si ya
-  existía, lo mergea sin pisar tus `permissions` ni tus hooks:
+> **¿Tu repo ya tiene `.claude/settings.json`?** No lo reemplaces. Ábrelo en
+> Claude Code y pega: *"Agrega a .claude/settings.json las claves de
+> https://raw.githubusercontent.com/Kevin-ToJoin/Albert-Efficient-Init/main/instalar/settings.json
+> sin quitar nada de lo que ya tiene"*.
+
+Windows, Mac y Linux, requisitos, qué ve el resto del equipo y problemas
+frecuentes: **[docs/instalar.md](docs/instalar.md)**.
+
+El archivo registra este repo como catálogo, habilita el plugin y activa la
+actualización automática:
 
 ```json
 {
@@ -52,12 +52,9 @@ commitear:
 }
 ```
 
-Commitea los dos. A partir de ahí, **quien clone el repo lo recibe solo**: al
-abrirlo en Claude Code y aceptar el diálogo de confianza de la carpeta, Claude
-Code registra el marketplace y carga el plugin, sin instalar nada.
-
-> Si en el repo destino `.claude/` o `CLAUDE.md` están en el `.gitignore`, el
-> equipo no recibe nada. `/albert:iniciar` te avisa si es el caso.
+Las reglas base no se copian a tu `CLAUDE.md`: el plugin las inyecta en cada
+sesión. Tu `CLAUDE.md` queda para lo propio del proyecto;
+`/albert:iniciar` te crea uno con la estructura sugerida.
 
 ### Actualizaciones
 
@@ -70,10 +67,8 @@ Para forzarlo en el momento: `/plugin marketplace update albert-efficient-init`.
 
 ### Quitarlo
 
-`/plugin uninstall albert@albert-efficient-init`. Te pregunta si quieres
-desactivarlo solo para ti o quitarlo para todo el equipo. En el segundo caso,
-borra también el bloque de `.claude/settings.json` y, si quieres, las reglas
-base del `CLAUDE.md`.
+Para todo el equipo: borra las dos claves de `.claude/settings.json` y
+commitea. Solo para ti: `/plugin`, pestaña **Installed**, desactívalo.
 
 ## Las skills
 
@@ -81,10 +76,11 @@ Todas llevan el prefijo del plugin: `/albert:<nombre>`.
 
 ### `/albert:iniciar`
 
-Integra el toolkit en el repo actual: escribe el `CLAUDE.md` y el
-`.claude/settings.json` de arriba. Es idempotente, así que correrlo dos veces no
-duplica nada. Si las reglas base de tu `CLAUDE.md` difieren de la plantilla
-actual, no las pisa: te avisa y decides tú.
+Opcional. Revisa la integración: completa `.claude/settings.json` si le falta
+algo (por ejemplo, el `autoUpdate`, si se instaló desde el panel de `/plugin`)
+y crea un `CLAUDE.md` con la estructura sugerida para lo propio del proyecto.
+Si tu `CLAUDE.md` tiene reglas base copiadas por una versión anterior, te
+ofrece quitarlas, porque ahora llegan solas.
 
 ### `/albert:finalizar`
 
@@ -155,8 +151,10 @@ cumple casi siempre.
 - **`guard-secretos.js`**: impide stagear o commitear `.env`, `*.pem`, `id_rsa`
   o `credentials.json`, y bloquea comandos con un token escrito dentro. Mira
   también lo que ya está en el index. Deja pasar `.env.example`.
+- **`reglas-base.js`**: inyecta las reglas base en cada sesión y en cada
+  subagente. Así llegan sin copiarse a tu `CLAUDE.md`, y se actualizan solas.
 
-Los dos fallan abierto: si no entienden su entrada, dejan pasar. Están en
+Los tres fallan abierto: si algo no cuadra, dejan pasar sin romper la sesión. Están en
 **Node** sin dependencias, porque un hook lo ejecuta el sistema operativo y el
 toolkit tiene que correr igual en Windows, macOS y Linux. **Lo único que
 necesita la máquina es Node.**
@@ -175,10 +173,12 @@ trampa de las variables con `TOKEN` o `KEY` en el nombre están en
 .claude-plugin/marketplace.json   el catálogo: un plugin, "albert", en ./plugin
 plugin/                           lo que le llega a los repos que lo integran
   .claude-plugin/plugin.json
+  reglas-base.md                  lo que el hook inyecta en cada sesión
   skills/                         iniciar, finalizar, lanzar-dominio, perfil-*
   agents/                         auditor-deuda, auditor-seguridad
-  hooks/                          hooks.json + guards en Node + sus pruebas
+  hooks/                          hooks.json, guards, reglas-base.js y pruebas
   .mcp.json
+instalar/settings.json            el único archivo que necesita un repo destino
 docs/                             cómo escribir cada pieza y qué va en cada una
 CLAUDE.md                         cómo trabajar en ESTE repo
 deuda-tecnica.md                  pendientes, mantenido por /albert:finalizar
