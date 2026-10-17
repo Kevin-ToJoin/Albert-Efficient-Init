@@ -160,7 +160,7 @@ bloquea todas las herramientas **en todos los repos que integran el toolkit**:
 node plugin/hooks/guards.test.js
 ```
 
-Correlo siempre que toques un guard. Buena parte de sus 47 casos comprueban lo
+Correlo siempre que toques un guard. Buena parte de sus 52 casos comprueban lo
 que **no** debe bloquear, que es donde estan los errores caros: una version
 anterior bloqueaba `git branch -d`, que es la variante segura, y el de secretos
 tiene que dejar pasar los `.env.example`.

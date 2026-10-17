@@ -9,11 +9,6 @@ es trabajo que un agente puede hacer solo.
 
 ## Abiertos
 
-- [ ] [M] El instalador en Windows funciona en PowerShell 7.6 (`irm ... | node -`),
-      pero falta PowerShell 5.1, la que trae Windows. El script es ASCII puro
-      para que el pipe de 5.1 no lo corrompa, y el CI lo vigila; lo que queda
-      por ver es si `irm` necesita TLS 1.2 forzado. Probarlo en la maquina
-      Windows. - `instalar/instalar.js`
 - [ ] [M] Migrar la maquina Windows del modelo de junction. Ahi siguen
       `~/.claude/skills` y `~/.claude/agents` apuntando a carpetas que ya no
       existen, y `~/.claude/settings.json` registra los guards con rutas a
@@ -48,8 +43,45 @@ es trabajo que un agente puede hacer solo.
 - [ ] [A] El checklist de comandos nuevos es manual; no hay script que lo
       ejecute. - `docs/comandos.md:131`
 
+- [ ] [M] Los cinco perfiles de rol (`perfil-datos`, `-api`, `-frontend`,
+      `-devops`, `-testing`) son practicas estandar escritas por un agente, no
+      salen de incidentes de este equipo. Hace falta que una persona de cada rol
+      los lea y recorte o corrija lo que no aplique antes de darlos por
+      buenos. - `plugin/skills/perfil-*/SKILL.md`
+- [ ] [A] Sin perfil ni auditor para mobile, data/ML, privacidad (GDPR) y
+      producto. Cada uno solo vale la pena si el equipo trabaja en ello; no se
+      escribe "por si acaso".
+- [ ] [A] `auditor-deuda` no es determinista: en pruebas repetidas dio por
+      cubierto un test saltado por tratar del mismo tema que un item
+      registrado, y sigue anadiendo notas sobre lo descartado pese a su regla
+      de "sin preambulo ni cierre". Se redujo con texto, no se puede garantizar
+      con texto. - `plugin/agents/auditor-deuda.md`
+
 ## Cerrados
 
+- [x] 2026-10-17 - Instalador verificado en **Windows PowerShell 5.1** real
+      (Desktop 5.1.26100) con el comando documentado `irm ... | node -`: sale
+      bien, es idempotente, escribe el `settings.local.json` correcto, lo
+      excluye de git y `git status` queda vacio. El TLS por defecto del sistema
+      bastaba, no hizo falta forzar TLS 1.2. - `instalar/instalar.js`
+- [x] 2026-10-17 - Disparo de los 8 perfiles probado con `claude -p
+      --plugin-dir` contra un repo vacio: datos, frontend, devops, testing y
+      api se cargan solos ante una tarea de su area; pedir un perfil por nombre
+      lo carga. `perfil-testing` no disparaba (su `description` empezaba por
+      principios abstractos) y se corrigio. Con una tarea mixta (api +
+      seguridad) Claude pregunta que perfil usar, que es lo que pide
+      `reglas-base.md`. - `plugin/skills/perfil-*/SKILL.md`
+- [x] 2026-10-17 - Los dos auditores ejecutados por primera vez contra repos
+      con fallos plantados. `auditor-seguridad` encontro los 8 plantados con
+      `archivo:linea` y dejo en "No verificable" lo que el codigo no puede
+      mostrar (RLS de Supabase). `auditor-deuda` se saltaba los `catch` vacios
+      aunque su regla los daba de ejemplo; corregido. - `plugin/agents/`
+- [x] 2026-10-17 - `guard-secretos` no veia un `.env` en el index si el comando
+      cambiaba de repo con `cd <repo> && git commit` o `git -C <repo> commit`:
+      solo miraba el cwd de la sesion, y el filtro de entrada ni reconocia
+      `git -C`. Lo destapo un `.env` commiteado sin bloqueo en un repo
+      temporal. Ahora mira el cwd y cada ruta de `cd`/`-C`; 5 casos nuevos.
+      - `plugin/hooks/guard-secretos.js`
 - [x] 2026-09-26 - Actualizacion verificada: tras el merge del PR #3, un
       companero integrado con `autoUpdate` activo trajo `4f20a7c` con
       `marketplace update` y la sesion siguiente cargo esa version. El disparo
@@ -153,6 +185,24 @@ es trabajo que un agente puede hacer solo.
       Convertidos a bloques `if`.
 
 ## Bitacora
+
+### 2026-10-17 - rama `completar-validacion`
+
+Tras publicar los cinco perfiles de rol, el toolkit estaba distribuido pero no
+probado. Esta vuelta lo comprueba en vez de suponerlo, y la prueba encontro
+tres fallos reales que leer el codigo no habia mostrado: un perfil que no se
+cargaba solo, un auditor que ignoraba los `catch` vacios, y un guard de
+secretos ciego a `cd` y a `git -C`.
+
+La leccion del guard es la mas cara: llego un `.env` a un commit en una prueba
+sin que nada lo bloqueara, y los 47 casos pasaban igual. Los tests cubrian el
+caso en que el cwd de la sesion es el repo; no el caso en que el comando apunta
+a otro. Un guard solo protege lo que sus pruebas imaginaron.
+
+Sigue sin hacerse: que una persona de cada rol revise los perfiles, y la
+migracion de la maquina Windows del modelo de junction.
+
+Nuevos pendientes: 3 | Cerrados: 4
 
 ### 2026-09-26 - rama `instalacion-personal`
 

@@ -139,6 +139,15 @@ try {
 
   comprobar(SEC, 'git commit -m "primer commit"', 2, sandbox, 'el .env esta en el index');
 
+  // El cwd de la sesion no es el repo al que apunta el comando. Antes el guard
+  // solo miraba el cwd y un `cd` o un `git -C` lo dejaba ciego.
+  const otro = os.tmpdir();
+  comprobar(SEC, 'cd "' + sandbox + '" && git commit -m "x"', 2, otro, 'cd al repo con .env');
+  comprobar(SEC, "cd '" + sandbox + "' && git commit -m \"x\"", 2, otro, 'cd con comillas simples');
+  comprobar(SEC, 'git -C "' + sandbox + '" commit -m "x"', 2, otro, 'git -C al repo con .env');
+  comprobar(SEC, 'cd cosa-que-no-existe && git commit -m "x"', 0, otro, 'cd a un sitio inexistente');
+  comprobar(SEC, 'cd "' + otro + '" && git commit -m "x"', 0, otro, 'cd a un sitio sin repo deja pasar');
+
   // git rm --cached, no git restore --staged: el repo aun no tiene HEAD y
   // restore --staged necesita uno.
   g(['rm', '--cached', '-q', '.env']);
