@@ -48,6 +48,11 @@ Skills que Claude carga **solo cuando la tarea lo pide**, leyendo su
 | `albert:perfil-codigo` | Desarrollo, code review, debugging, refactors |
 | `albert:perfil-analisis` | Analisis de datos, research, reporting |
 | `albert:perfil-seguridad` | Autenticacion, datos de usuarios, endpoints publicos, pagos, secretos |
+| `albert:perfil-datos` | Esquemas, migraciones, consultas, indices, backups |
+| `albert:perfil-api` | Endpoints, servicios, integraciones con terceros, colas |
+| `albert:perfil-frontend` | Componentes, paginas, formularios, estado del navegador |
+| `albert:perfil-devops` | CI/CD, infraestructura, despliegues, monitoreo, incidentes |
+| `albert:perfil-testing` | Escribir, revisar o arreglar tests |
 
 Tambien se pueden pedir en un prompt: *"aplica el perfil de codigo y revisa
 esta funcion"*.
