@@ -44,12 +44,21 @@ Funciones vacias con `pass`/`return null` y nombre de intencion, handlers que
 solo loguean, ramas `else` vacias, constantes hardcodeadas con nombre de
 configuracion, credenciales o URLs de prueba en codigo de produccion.
 
+Los `catch` y `except` que tragan el error son deuda aunque no lleven marcador:
+un bloque vacio (`catch (e) {}`, `except: pass`) o que solo hace `return`. Busca
+con Grep `catch\s*(\([^)]*\))?\s*\{\s*\}` y `except.*:\s*pass`.
+
 Aqui se cauto: reporta solo lo que sea evidente al leerlo, no sospechas.
 
 ### 5. Cruza y filtra
 
 Descarta todo lo que ya aparezca en `## Abiertos`, aunque este redactado
 distinto. Compara por lo que describe, no por las palabras exactas.
+
+Un item solo cubre un hallazgo si habla de **ese mismo** codigo o test. Que
+traten del mismo tema no basta: un item sobre una funcion no cubre un test
+saltado de esa funcion. Cada test desactivado se reporta aparte, salvo que
+`## Abiertos` lo nombre.
 
 ## Reporte
 
@@ -83,4 +92,6 @@ Todo registrado.
 - **Sin opiniones de estilo.** Formato, nombres y preferencias no son deuda.
 - **Maximo 20 items.** Si hay mas, reporta los 20 mas concretos y cierra con
   `(+N mas)`. Un reporte de 200 lineas no lo lee nadie.
-- **Sin preambulo ni cierre.** Empieza por la primera linea del reporte.
+- **Sin preambulo ni cierre.** Empieza por la primera linea del reporte. No
+  anadas notas sobre lo que descartaste ni por que: lo descartado no se
+  menciona.
