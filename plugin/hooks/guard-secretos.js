@@ -22,6 +22,7 @@
  */
 
 const fs = require('fs');
+const path = require('path');
 const { execFileSync } = require('child_process');
 
 function leerStdin() {
@@ -79,7 +80,11 @@ for (const p of patronesSecreto) {
 
 // --- 2. Archivos de credenciales en git add / git commit ---------------------
 
-if (!/git\s+(add|commit|stash\s+push)\b/.test(cmd)) process.exit(0);
+// `git -C <ruta>` va entre `git` y el subcomando y tambien cuenta.
+const gitSub = (subs) =>
+  new RegExp('\\bgit(?:\\s+-C\\s+(?:"[^"]+"|\'[^\']+\'|[^\\s;&|]+))?\\s+(?:' + subs + ')\\b');
+
+if (!gitSub('add|commit|stash\\s+push').test(cmd)) process.exit(0);
 
 // Nombres que son credenciales. Las plantillas quedan fuera a proposito.
 const reSensible =
@@ -107,7 +112,7 @@ const encontrados = new Set();
 //
 // Para `git commit` manda el index (2b), que es la verdad de git y no una
 // suposicion sobre el texto.
-if (/git\s+(add|stash\s+push)\b/.test(cmd)) {
+if (gitSub('add|stash\\s+push').test(cmd)) {
   // Lo entrecomillado se aparta, y de ahi solo cuenta lo que es una ruta y
   // nada mas, para que `git add ".env"` siga bloqueado.
   const entrecomillados = [];
@@ -129,20 +134,32 @@ if (/git\s+(add|stash\s+push)\b/.test(cmd)) {
 }
 
 // 2b. Lo que ya este en el index. Cubre "git add ." seguido de "git commit".
-try {
-  const cwd = payload.cwd;
-  if (cwd && fs.existsSync(cwd)) {
+// El repo no tiene por que ser el cwd de la sesion: `cd <repo> && git commit` y
+// `git -C <repo> commit` commitean en otro sitio. Se miran el cwd y cada
+// directorio que el comando nombra con cd o -C; solo se extrae una ruta, no se
+// interpreta el shell. Si la ruta no existe o no es un repo, se ignora.
+const reDestino = /(?:\bcd|\bgit\s+-C)\s+(?:"([^"]+)"|'([^']+)'|([^\s;&|]+))/g;
+const dirs = new Set();
+if (payload.cwd) dirs.add(payload.cwd);
+for (const m of cmd.matchAll(reDestino)) {
+  const d = m[1] || m[2] || m[3];
+  dirs.add(path.resolve(payload.cwd || process.cwd(), d));
+}
+
+for (const dir of dirs) {
+  try {
+    if (!fs.existsSync(dir)) continue;
     const out = execFileSync('git', ['diff', '--cached', '--name-only'], {
-      cwd: cwd,
+      cwd: dir,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     });
     for (const f of out.split('\n')) {
       if (f && esSensible(f)) encontrados.add(f.trim());
     }
+  } catch (e) {
+    // git no disponible, o no es un repo: no bloqueamos por eso.
   }
-} catch (e) {
-  // git no disponible, o no es un repo: no bloqueamos por eso.
 }
 
 if (encontrados.size > 0) {
