@@ -93,7 +93,22 @@ Solo si no hay generador, escribe el XML:
 Una entrada por ruta publica real. No inventes rutas que no existan en el
 proyecto: comprueba antes con Glob.
 
-### 5. Google Search Console
+### 5. Autenticacion del correo
+
+Sin esto el correo transaccional acaba en spam aunque el reparto sea correcto.
+No lo puedes configurar tu: va en el DNS. Reportalo como pendiente manual, una
+vez por cada subdominio que envie (`email.` e `info.`):
+
+1. **SPF**: registro TXT que lista quien puede enviar por ese subdominio. Un
+   solo registro SPF por nombre; dos invalidan ambos.
+2. **DKIM**: el proveedor de correo da una clave; se publica como TXT o CNAME.
+3. **DMARC**: registro TXT en `_dmarc.<subdominio>`. Empieza con `p=none` y un
+   `rua=` para recibir reportes; sube a `quarantine` cuando los reportes salgan
+   limpios.
+
+Los valores exactos los da el proveedor. No los inventes.
+
+### 6. Google Search Console
 
 Esto no lo puedes hacer tu. Reportalo como pendiente manual con los pasos:
 
@@ -119,4 +134,4 @@ Los pasos de DNS, registrador y Search Console van **siempre** en el segundo
 bloque: no son cosas del repo.
 
 Si el sitio no se va a indexar (una app privada, una API), dilo y salta los
-pasos 3 a 5 en vez de generar archivos que nadie va a usar.
+pasos 3, 4 y 6 en vez de generar archivos que nadie va a usar.
