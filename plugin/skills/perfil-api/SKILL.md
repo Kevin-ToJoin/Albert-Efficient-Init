@@ -44,6 +44,17 @@ limit y errores hacia el cliente estan en `albert:perfil-seguridad`.
   peticion HTTP.
 - Sin trabajo en cada peticion que podria hacerse una vez al arrancar.
 
+## Correo
+
+- El correo transaccional (registro, recuperar contrasena, recibos) sale por un
+  subdominio distinto al de las campanas. Ver `/albert:lanzar-dominio`.
+- Un envio es una operacion que cuesta y no se deshace: va a una cola, es
+  idempotente y tiene rate limit por destinatario.
+- El enlace de recuperar contrasena lleva un token de un solo uso y con
+  caducidad. Nunca la contrasena ni nada que la delate.
+- Si el proveedor informa rebotes o quejas, el sistema deja de escribir a esa
+  direccion. Insistir hunde la reputacion de envio.
+
 ## Configuracion
 
 - Lo que cambia entre entornos viene del entorno, no del codigo.

@@ -1,6 +1,6 @@
 ---
 name: perfil-testing
-description: Principios de pruebas - probar el comportamiento y los bordes, pruebas que fallan por la razon correcta, sin tests que pasan siempre, cobertura de lo que cuesta caro cuando falla. Cargarlo cuando el trabajo toque escribir, revisar o arreglar tests.
+description: Escribir, revisar o arreglar tests y pruebas unitarias, de integracion o end-to-end - que casos cubrir, bordes, mocks, cobertura, tests intermitentes o que pasan siempre. Cargarlo siempre que la tarea mencione tests, pruebas, casos de prueba o cobertura.
 ---
 
 # Perfil de testing
