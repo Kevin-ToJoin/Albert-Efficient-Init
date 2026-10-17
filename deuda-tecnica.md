@@ -9,17 +9,12 @@ es trabajo que un agente puede hacer solo.
 
 ## Abiertos
 
-- [ ] [M] Migrar la maquina Windows del modelo de junction. Ahi siguen
-      `~/.claude/skills` y `~/.claude/agents` apuntando a carpetas que ya no
-      existen, y `~/.claude/settings.json` registra los guards con rutas a
-      `hooks/` que tampoco existen: `node` falla en cada Bash con un error no
-      bloqueante y **los guards dejan de proteger**. Quitar
-      las dos junctions y el bloque de hooks, e integrar el plugin. Y fijar ahi
-      `git config --global user.email 102131063+Kevin-ToJoin@users.noreply.github.com`:
-      de esa maquina salieron los commits con el correo personal.
-- [ ] [M] En GitHub, Settings > Emails: activar "Keep my email addresses
-      private" y "Block command line pushes that expose my email". Es lo que
-      impide que el correo personal vuelva a colarse desde cualquier maquina.
+- [ ] [M] Terminar la migracion de la maquina Windows: falta alinear el `main`
+      local con el remoto (`git reset --hard origin/main`, que el guard
+      bloquea a los agentes a proposito) y borrar la carpeta vacia
+      `skills/synced`. Mientras no se haga, el clon local sigue en la
+      historia anterior al plugin; esta respaldada en el tag local
+      `respaldo-main-local-pre-plugin`.
 - [ ] [A] El campo `memory: project` de `auditor-deuda` esta puesto sin
       verificar. La referencia lo documenta como alcance de memoria persistente
       pero no describe como escribe el agente en ella; hace falta comprobar en
@@ -43,11 +38,6 @@ es trabajo que un agente puede hacer solo.
 - [ ] [A] El checklist de comandos nuevos es manual; no hay script que lo
       ejecute. - `docs/comandos.md:131`
 
-- [ ] [M] Los cinco perfiles de rol (`perfil-datos`, `-api`, `-frontend`,
-      `-devops`, `-testing`) son practicas estandar escritas por un agente, no
-      salen de incidentes de este equipo. Hace falta que una persona de cada rol
-      los lea y recorte o corrija lo que no aplique antes de darlos por
-      buenos. - `plugin/skills/perfil-*/SKILL.md`
 - [ ] [A] Sin perfil ni auditor para mobile, data/ML, privacidad (GDPR) y
       producto. Cada uno solo vale la pena si el equipo trabaja en ello; no se
       escribe "por si acaso".
@@ -59,6 +49,20 @@ es trabajo que un agente puede hacer solo.
 
 ## Cerrados
 
+- [x] 2026-10-17 - Revision humana de los cinco perfiles de rol (`perfil-datos`,
+      `-api`, `-frontend`, `-devops`, `-testing`): la hizo el mantenedor y los
+      da por buenos. - `plugin/skills/perfil-*/SKILL.md`
+- [x] 2026-10-17 - Migrada la maquina Windows al plugin: plugin instalado a
+      nivel de usuario (guards y reglas valen en todos los repos, como antes
+      con los hooks globales), junctions `~/.claude/skills` y `agents`
+      eliminadas, bloque de hooks con rutas viejas quitado de
+      `~/.claude/settings.json` (con respaldo y `permissions` intactos), y
+      `git config` global fijado al correo `noreply`. El correo personal venia
+      del `.git/config` del propio clon, que pisaba al global; quitado.
+- [x] 2026-10-17 - En GitHub: "Keep my email addresses private" y "Block command
+      line pushes that expose my email" activados por el mantenedor.
+- [x] 2026-10-17 - Borradas las ramas remotas ya mergeadas; `origin` solo tiene
+      `main`.
 - [x] 2026-10-17 - Instalador verificado en **Windows PowerShell 5.1** real
       (Desktop 5.1.26100) con el comando documentado `irm ... | node -`: sale
       bien, es idempotente, escribe el `settings.local.json` correcto, lo
