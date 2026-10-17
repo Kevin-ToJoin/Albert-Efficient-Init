@@ -121,8 +121,8 @@ no puede hacer: DNS, registrador y Search Console.
 
 ### Los perfiles
 
-`albert:perfil-codigo`, `albert:perfil-analisis` y `albert:perfil-seguridad`
-son reglas que Claude carga **solo cuando la tarea lo pide**, para no gastar
+`albert:perfil-codigo`, `-analisis`, `-seguridad`, `-datos`, `-api`,
+`-frontend`, `-devops` y `-testing` son reglas por rol que Claude carga **solo cuando la tarea lo pide**, para no gastar
 contexto en reglas que no aplican. No hace falta invocarlos: Claude lee su
 descripción y decide. También puedes pedirlos: *"aplica el perfil de código y
 revisa esta función"*.

@@ -31,6 +31,14 @@ tarea lo pide, no por defecto:
 - `albert:perfil-analisis` para analisis de datos, research y reporting.
 - `albert:perfil-seguridad` cuando el trabajo toque autenticacion, datos de
   usuarios, endpoints publicos, pagos o secretos.
+- `albert:perfil-datos` para esquemas, migraciones, consultas e indices.
+- `albert:perfil-api` para endpoints, servicios, integraciones con terceros y
+  colas.
+- `albert:perfil-frontend` para componentes, paginas, formularios y estado del
+  navegador.
+- `albert:perfil-devops` para CI/CD, infraestructura, despliegues, monitoreo e
+  incidentes.
+- `albert:perfil-testing` para escribir, revisar o arreglar tests.
 
 Si la tarea es mixta o no esta clara, pregunta que perfil usar en vez de
 adivinar.
