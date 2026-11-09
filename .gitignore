@@ -11,3 +11,11 @@ desktop.ini
 
 # Claude Code local session data
 .claude/
+
+# Secretos locales: nunca al repo (los .env.example si)
+.env
+.env.*
+!.env.example
+
+# Skills integradas que la app de Claude sincroniza via la junction de ~/.claude/skills
+skills/synced/
