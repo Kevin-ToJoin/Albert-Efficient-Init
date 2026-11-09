@@ -11,3 +11,8 @@ desktop.ini
 
 # Claude Code local session data
 .claude/
+
+# Secretos locales: nunca al repo (los .env.example si)
+.env
+.env.*
+!.env.example
