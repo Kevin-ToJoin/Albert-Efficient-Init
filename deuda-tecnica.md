@@ -9,12 +9,11 @@ es trabajo que un agente puede hacer solo.
 
 ## Abiertos
 
-- [ ] [M] Terminar la migracion de la maquina Windows: falta alinear el `main`
-      local con el remoto (`git reset --hard origin/main`, que el guard
-      bloquea a los agentes a proposito) y borrar la carpeta vacia
-      `skills/synced`. Mientras no se haga, el clon local sigue en la
-      historia anterior al plugin; esta respaldada en el tag local
-      `respaldo-main-local-pre-plugin`.
+- [ ] [M] Decidir si se borra `skills/synced/` en la carpeta principal. No esta
+      vacia (227 archivos, 3.8 MB): es una copia de las skills integradas de
+      Claude que quedo de antes de la migracion y no se escribe desde el
+      2026-10-17. Esta ignorada en `.gitignore`, asi que no estorba; borrarla
+      es opcional.
 - [ ] [A] El campo `memory: project` de `auditor-deuda` esta puesto sin
       verificar. La referencia lo documenta como alcance de memoria persistente
       pero no describe como escribe el agente en ella; hace falta comprobar en
@@ -49,6 +48,12 @@ es trabajo que un agente puede hacer solo.
 
 ## Cerrados
 
+- [x] 2026-11-09 - Alineado el `main` local con `origin/main` (`git reset
+      --hard`, con el visto bueno del mantenedor). `Albert-Efficient-Init-plugin`
+      es un worktree de `Albert-Efficient-Init`, no un clon aparte: comparten
+      ramas y tags, asi que un solo reset alineo ambas carpetas. Los 14
+      commits locales anteriores al plugin siguen en el tag local
+      `respaldo-main-local-pre-plugin`. Ademas, `.gitignore` ignora `.env*`.
 - [x] 2026-10-17 - Revision humana de los cinco perfiles de rol (`perfil-datos`,
       `-api`, `-frontend`, `-devops`, `-testing`): la hizo el mantenedor y los
       da por buenos. - `plugin/skills/perfil-*/SKILL.md`
